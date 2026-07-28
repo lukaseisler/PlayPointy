@@ -1,0 +1,194 @@
+====================================================================================================
+PLAYPOINTY - KARTEN/BILDER MAPPING CHECK (DRY RUN)
+====================================================================================================
+
+Excel-Datei  : PlayPointy (1).xlsx
+Bilder-Ordner: C:\Users\Anwender\Desktop\PlayPointy\Packs
+Gefundene Bilder gesamt: 150
+Gefundene Karten gesamt: 150
+
+Erkannte Pack-Bereiche (automatisch anhand Header + erster Luecke erkannt):
+  - Starter Chaos      Spalte B/C  Zeilen 3-32  (30 Karten)
+  - Dark & Evil        Spalte F/G  Zeilen 3-32  (30 Karten)
+  - Roast Friends      Spalte I/J  Zeilen 3-32  (30 Karten)
+  - Toxic Love         Spalte B/C  Zeilen 36-65  (30 Karten)
+  - Unhinged Nights    Spalte F/G  Zeilen 36-65  (30 Karten)
+
+----------------------------------------------------------------------------------------------------
+ZUORDNUNGEN
+----------------------------------------------------------------------------------------------------
+
+### Pack: Starter Chaos ###
+[Packs/Starter Chaos/Finished/Get way too drunk at the office Christmas party.webp] -> [Ziel-ID: card_001.webp] | Match: 100.0% | Hex: #2d5c37 | Text aus Excel: Get way too drunk at the office Christmas party? (Unhinged Nights)
+[Packs/Starter Chaos/Finished/Get rejected in a bar.webp] -> [Ziel-ID: card_002.webp] | Match: 100.0% | Hex: #ed716c | Text aus Excel: Get rejected in a bar? (Unhinged Nights)
+[Packs/Starter Chaos/Finished/Have the craziest drunk story.webp] -> [Ziel-ID: card_003.webp] | Match: 100.0% | Hex: #ff5400 | Text aus Excel: Have the craziest drunk story? (Unhinged Nights)
+[Packs/Starter Chaos/Finished/Kiss an unattractive person for bottle service.webp] -> [Ziel-ID: card_004.webp] | Match: 100.0% | Hex: #ff0060 | Text aus Excel: Kiss an unattractive person for bottle service? (Unhinged Nights)
+[Packs/Starter Chaos/Finished/Start a deep philosophical debate while blackout drunk.webp] -> [Ziel-ID: card_005.webp] | Match: 100.0% | Hex: #816800 | Text aus Excel: Start a deep philosophical debate while blackout drunk? (Unhinged Nights)
+[Packs/Starter Chaos/Finished/Go home with someone they instantly regret.webp] -> [Ziel-ID: card_006.webp] | Match: 100.0% | Hex: #9c9c00 | Text aus Excel: Go home with someone they instantly regret? (Unhinged Nights)
+[Packs/Starter Chaos/Finished/Keep drinking after puking.webp] -> [Ziel-ID: card_007.webp] | Match: 100.0% | Hex: #39544b | Text aus Excel: Keep drinking after puking? (Unhinged Nights)
+[Packs/Starter Chaos/Finished/Lose control of money in the club.webp] -> [Ziel-ID: card_008.webp] | Match: 100.0% | Hex: #275a5d | Text aus Excel: Lose control of money in the club? (Unhinged Nights)
+[Packs/Starter Chaos/Finished/Do body shots off a stranger.webp] -> [Ziel-ID: card_009.webp] | Match: 100.0% | Hex: #2c2b55 | Text aus Excel: Do body shots off a stranger? (Unhinged Nights)
+[Packs/Starter Chaos/Finished/End up arrested.webp] -> [Ziel-ID: card_010.webp] | Match: 100.0% | Hex: #9b17f8 | Text aus Excel: End up arrested? (Unhinged Nights)
+[Packs/Starter Chaos/Finished/Have the most exes.webp] -> [Ziel-ID: card_011.webp] | Match: 100.0% | Hex: #e100b2 | Text aus Excel: Have the most exes? (Toxic Love)
+[Packs/Starter Chaos/Finished/Fall for every walking red flag.webp] -> [Ziel-ID: card_012.webp] | Match: 100.0% | Hex: #403d36 | Text aus Excel: Fall for every walking red flag? (Toxic Love)
+[Packs/Starter Chaos/Finished/Get back with the same toxic ex for the tenth time.webp] -> [Ziel-ID: card_013.webp] | Match: 100.0% | Hex: #4b8980 | Text aus Excel: Get back with the same toxic ex for the tenth time? (Toxic Love)
+[Packs/Starter Chaos/Finished/Have the worst pickup line.webp] -> [Ziel-ID: card_014.webp] | Match: 100.0% | Hex: #01a26b | Text aus Excel: Have the worst pickup line? (Toxic Love)
+[Packs/Starter Chaos/Finished/get a child from a hookup.webp] -> [Ziel-ID: card_015.webp] | Match: 100.0% | Hex: #b4c30f | Text aus Excel: get a child from a hookup? (Toxic Love)
+[Packs/Starter Chaos/Finished/Lie about their body count.webp] -> [Ziel-ID: card_016.webp] | Match: 100.0% | Hex: #c3170f | Text aus Excel: Lie about their body count? (Toxic Love)
+[Packs/Starter Chaos/Finished/have a list of all their hookups.webp] -> [Ziel-ID: card_017.webp] | Match: 100.0% | Hex: #272337 | Text aus Excel: have a list of all their hookups? (Toxic Love)
+[Packs/Starter Chaos/Finished/Park like a total asshole.webp] -> [Ziel-ID: card_018.webp] | Match: 100.0% | Hex: #ac733b | Text aus Excel: Park like a total asshole? (Dark)
+[Packs/Starter Chaos/Finished/Say something racist when drunk.webp] -> [Ziel-ID: card_019.webp] | Match: 100.0% | Hex: #8cd80e | Text aus Excel: Say something racist when drunk? (Dark)
+[Packs/Starter Chaos/Finished/Destroy their ex's property out of anger.webp] -> [Ziel-ID: card_020.webp] | Match: 87.6% | Hex: #355945 | Text aus Excel: Destroy their ex's property out of anger? Toxic Love
+[Packs/Starter Chaos/Finished/Laugh at a cancer joke.webp] -> [Ziel-ID: card_021.webp] | Match: 100.0% | Hex: #314539 | Text aus Excel: Laugh at a cancer joke? (Dark)
+[Packs/Starter Chaos/Finished/Be a secret serial killer.webp] -> [Ziel-ID: card_022.webp] | Match: 100.0% | Hex: #980707 | Text aus Excel: Be a secret serial killer? (Dark)
+[Packs/Starter Chaos/Finished/Write hate comments on a child's video.webp] -> [Ziel-ID: card_023.webp] | Match: 100.0% | Hex: #ca6a7a | Text aus Excel: Write hate comments on a child's video? (Dark)
+[Packs/Starter Chaos/Finished/Have a freak party with baby oil.webp] -> [Ziel-ID: card_024.webp] | Match: 100.0% | Hex: #3577b3 | Text aus Excel: Have a freak party with baby oil? (Dark)
+[Packs/Starter Chaos/Finished/Kick a puppy for 1000.webp] -> [Ziel-ID: card_025.webp] | Match: 97.7% | Hex: #ca9700 | Text aus Excel: Kick a puppy for $1,000? (Dark)
+[Packs/Starter Chaos/Finished/Eat dog food on camera for 50.webp] -> [Ziel-ID: card_026.webp] | Match: 98.3% | Hex: #717c89 | Text aus Excel: Eat dog food on camera for $50? (Roast)
+[Packs/Starter Chaos/Finished/Become a wannabe food influencer.webp] -> [Ziel-ID: card_027.webp] | Match: 100.0% | Hex: #33b943 | Text aus Excel: Become a wannabe food influencer? (Roast)
+[Packs/Starter Chaos/Finished/Watch brain rot content for hours.webp] -> [Ziel-ID: card_028.webp] | Match: 100.0% | Hex: #7612d3 | Text aus Excel: Watch brain rot content for hours? (Roast)
+[Packs/Starter Chaos/Finished/Become homeless from terrible life choices.webp] -> [Ziel-ID: card_029.webp] | Match: 100.0% | Hex: #156145 | Text aus Excel: Become homeless from terrible life choices? (Roast)
+[Packs/Starter Chaos/Finished/Can't take a joke.webp] -> [Ziel-ID: card_030.webp] | Match: 100.0% | Hex: #7f3a5b | Text aus Excel: Can't take a joke? (Roast)
+
+### Pack: Dark & Evil ###
+[Packs/Dark & Evil/Finished/Commit domestic violence.webp] -> [Ziel-ID: card_031.webp] | Match: 100.0% | Hex: #a7bb00 | Text aus Excel: Commit domestic violence?
+[Packs/Dark & Evil/Finished/Rat out the group if the cops show up.webp] -> [Ziel-ID: card_032.webp] | Match: 100.0% | Hex: #8d581c | Text aus Excel: Rat out the group if the cops show up?
+[Packs/Dark & Evil/Finished/Know the darkest joke.webp] -> [Ziel-ID: card_033.webp] | Match: 100.0% | Hex: #bb783d | Text aus Excel: Know the darkest joke?
+[Packs/Dark & Evil/Finished/Secretly hope your best friend fails.webp] -> [Ziel-ID: card_034.webp] | Match: 100.0% | Hex: #856d0e | Text aus Excel: Secretly hope your best friend fails?
+[Packs/Dark & Evil/Finished/Loot stores if a riot breaks out.webp] -> [Ziel-ID: card_035.webp] | Match: 100.0% | Hex: #dbb500 | Text aus Excel: Loot stores if a riot breaks out?
+[Packs/Dark & Evil/Finished/Wish for another global pandemic.webp] -> [Ziel-ID: card_036.webp] | Match: 100.0% | Hex: #20be7c | Text aus Excel: Wish for another global pandemic?
+[Packs/Dark & Evil/Finished/Take a selfie at a funeral.webp] -> [Ziel-ID: card_037.webp] | Match: 100.0% | Hex: #609529 | Text aus Excel: Take a selfie at a funeral?
+[Packs/Dark & Evil/Finished/Poop on the lid in a restaurant for 500 bucks.webp] -> [Ziel-ID: card_038.webp] | Match: 100.0% | Hex: #f16b52 | Text aus Excel: Poop on the lid in a restaurant for 500 bucks?
+[Packs/Dark & Evil/Finished/Be secretly attracted to their sibling.webp] -> [Ziel-ID: card_039.webp] | Match: 100.0% | Hex: #10b3c6 | Text aus Excel: Be secretly attracted to their sibling?
+[Packs/Dark & Evil/Finished/Say the n-word.webp] -> [Ziel-ID: card_040.webp] | Match: 100.0% | Hex: #be20a2 | Text aus Excel: Say the n-word?
+[Packs/Dark & Evil/Finished/Secretly film someone at the pool.webp] -> [Ziel-ID: card_041.webp] | Match: 100.0% | Hex: #2e9b9f | Text aus Excel: Secretly film someone at the pool?
+[Packs/Dark & Evil/Finished/Give someone diarrhea tablets for fun.webp] -> [Ziel-ID: card_042.webp] | Match: 100.0% | Hex: #c9504c | Text aus Excel: Give someone diarrhea tablets for fun?
+[Packs/Dark & Evil/Finished/drop a baby on accident.webp] -> [Ziel-ID: card_043.webp] | Match: 100.0% | Hex: #28a944 | Text aus Excel: Drop a baby on accident?
+[Packs/Dark & Evil/Finished/Burn the house down on accident.webp] -> [Ziel-ID: card_044.webp] | Match: 100.0% | Hex: #fd4500 | Text aus Excel: Burn the house down on accident?
+[Packs/Dark & Evil/Finished/Invest money into a war company.webp] -> [Ziel-ID: card_045.webp] | Match: 100.0% | Hex: #d4113a | Text aus Excel: Invest money into a war company?
+[Packs/Dark & Evil/Finished/Take a low blow for 1000 bucks.webp] -> [Ziel-ID: card_046.webp] | Match: 87.3% | Hex: #2b6a65 | Text aus Excel: Take a low blow for $1,000?
+[Packs/Dark & Evil/Finished/Talk shit about someone then act nice to their face.webp] -> [Ziel-ID: card_047.webp] | Match: 100.0% | Hex: #0d32aa | Text aus Excel: Talk shit about someone then act nice to their face?
+[Packs/Dark & Evil/Finished/Die alone surrounded by cats.webp] -> [Ziel-ID: card_048.webp] | Match: 100.0% | Hex: #179dae | Text aus Excel: Die alone surrounded by cats?
+[Packs/Dark & Evil/Finished/Have the darkest secrets.webp] -> [Ziel-ID: card_049.webp] | Match: 100.0% | Hex: #565f67 | Text aus Excel: Have the darkest secrets?
+[Packs/Dark & Evil/Finished/Stalk someone’s profile for hours.webp] -> [Ziel-ID: card_050.webp] | Match: 100.0% | Hex: #c337cb | Text aus Excel: Stalk someone’s profile for hours?
+[Packs/Dark & Evil/Finished/Ignore a beggar.webp] -> [Ziel-ID: card_051.webp] | Match: 100.0% | Hex: #30aba8 | Text aus Excel: Ignore a beggar?
+[Packs/Dark & Evil/Finished/Wish harm on more than three people.webp] -> [Ziel-ID: card_052.webp] | Match: 100.0% | Hex: #d253a9 | Text aus Excel: Wish harm on more than three people?
+[Packs/Dark & Evil/Finished/Have stolen stuff before.webp] -> [Ziel-ID: card_053.webp] | Match: 100.0% | Hex: #517879 | Text aus Excel: Have stolen stuff before?
+[Packs/Dark & Evil/Finished/Secretly be a drug dealer.webp] -> [Ziel-ID: card_054.webp] | Match: 100.0% | Hex: #3e2783 | Text aus Excel: Secretly be a drug dealer?
+[Packs/Dark & Evil/Finished/Not return a found wallet.webp] -> [Ziel-ID: card_055.webp] | Match: 100.0% | Hex: #8477aa | Text aus Excel: Not return a found wallet?
+[Packs/Dark & Evil/Finished/Get slapped in the face someday.webp] -> [Ziel-ID: card_056.webp] | Match: 100.0% | Hex: #842b55 | Text aus Excel: Get slapped in the face someday?
+[Packs/Dark & Evil/Finished/The first do die in a horror movie.webp] -> [Ziel-ID: card_057.webp] | Match: 100.0% | Hex: #2bc7ad | Text aus Excel: The first do die in a horror movie?
+[Packs/Dark & Evil/Finished/Get addicted to gambling.webp] -> [Ziel-ID: card_058.webp] | Match: 100.0% | Hex: #0fad97 | Text aus Excel: Get addicted to gambling?
+[Packs/Dark & Evil/Finished/Take a prank too far.webp] -> [Ziel-ID: card_059.webp] | Match: 100.0% | Hex: #0e93d8 | Text aus Excel: Take a prank too far?
+[Packs/Dark & Evil/Finished/Leave their partner with the baby.webp] -> [Ziel-ID: card_060.webp] | Match: 100.0% | Hex: #c41b86 | Text aus Excel: Leave their partner with the baby
+
+### Pack: Roast Friends ###
+[Packs/Roast Friends/Finished/Fart loudly in public.webp] -> [Ziel-ID: card_061.webp] | Match: 100.0% | Hex: #317d39 | Text aus Excel: Fart loudly in public?
+[Packs/Roast Friends/Finished/Wear sunglasses indoors because so cool.webp] -> [Ziel-ID: card_062.webp] | Match: 100.0% | Hex: #de6016 | Text aus Excel: Wear sunglasses indoors because so cool?
+[Packs/Roast Friends/Finished/Fail a handshake in front of others.webp] -> [Ziel-ID: card_063.webp] | Match: 100.0% | Hex: #44c346 | Text aus Excel: Fail a handshake in front of others?
+[Packs/Roast Friends/Finished/Post cringey quotes on their story.webp] -> [Ziel-ID: card_064.webp] | Match: 100.0% | Hex: #b76762 | Text aus Excel: Post cringey quotes on their story?
+[Packs/Roast Friends/Finished/Be a Tesler-Bro.webp] -> [Ziel-ID: card_065.webp] | Match: 100.0% | Hex: #006fde | Text aus Excel: Be a Tesler-Bro
+[Packs/Roast Friends/Finished/Do Hyrox and post about it.webp] -> [Ziel-ID: card_066.webp] | Match: 100.0% | Hex: #00e0c0 | Text aus Excel: Do Hyrox and post about it?
+[Packs/Roast Friends/Finished/Still use Facebook like a boomer.webp] -> [Ziel-ID: card_067.webp] | Match: 100.0% | Hex: #ba0000 | Text aus Excel: Still use Facebook like a boomer?
+[Packs/Roast Friends/Finished/Make a joke that kills the vibe.webp] -> [Ziel-ID: card_068.webp] | Match: 100.0% | Hex: #169075 | Text aus Excel: Make a joke that kills the vibe?
+[Packs/Roast Friends/Finished/Go full ghost mode.webp] -> [Ziel-ID: card_069.webp] | Match: 100.0% | Hex: #ff007e | Text aus Excel: Go full ghost mode
+[Packs/Roast Friends/Finished/Fall for an internet scammer.webp] -> [Ziel-ID: card_070.webp] | Match: 100.0% | Hex: #26e3df | Text aus Excel: Fall for an internet scammer?
+[Packs/Roast Friends/Finished/Try to push a pull door.webp] -> [Ziel-ID: card_071.webp] | Match: 100.0% | Hex: #c44238 | Text aus Excel: Try to push a pull door?
+[Packs/Roast Friends/Finished/Run into a flag pole due to phone addiction.webp] -> [Ziel-ID: card_072.webp] | Match: 100.0% | Hex: #d60099 | Text aus Excel: Run into a flag pole due to phone addiction?
+[Packs/Roast Friends/Finished/ruin a surprise party.webp] -> [Ziel-ID: card_073.webp] | Match: 100.0% | Hex: #00ba63 | Text aus Excel: Ruin a surprise party?
+[Packs/Roast Friends/Finished/Get a tattoo they will regret.webp] -> [Ziel-ID: card_074.webp] | Match: 100.0% | Hex: #001fde | Text aus Excel: Get a tattoo they will regret?
+[Packs/Roast Friends/Finished/set off fire alarm cooking.webp] -> [Ziel-ID: card_075.webp] | Match: 100.0% | Hex: #d86f31 | Text aus Excel: set off fire alarm cooking
+[Packs/Roast Friends/Finished/Clog the toilet.webp] -> [Ziel-ID: card_076.webp] | Match: 100.0% | Hex: #ff6316 | Text aus Excel: Clog the toilet?
+[Packs/Roast Friends/Finished/Ghost their entire family after one fight.webp] -> [Ziel-ID: card_077.webp] | Match: 100.0% | Hex: #b700d2 | Text aus Excel: Ghost their entire family after one fight?
+[Packs/Roast Friends/Finished/Say exactly what they think to someone’s face.webp] -> [Ziel-ID: card_078.webp] | Match: 100.0% | Hex: #32d225 | Text aus Excel: Say exactly what they think to someone’s face?
+[Packs/Roast Friends/Finished/Be a Karen in public.webp] -> [Ziel-ID: card_079.webp] | Match: 100.0% | Hex: #e20044 | Text aus Excel: Be a Karen in public?
+[Packs/Roast Friends/Finished/Get a temper with a customer.webp] -> [Ziel-ID: card_080.webp] | Match: 100.0% | Hex: #00b299 | Text aus Excel: Get a temper with a customer?
+[Packs/Roast Friends/Finished/Have a midlife crisis.webp] -> [Ziel-ID: card_081.webp] | Match: 100.0% | Hex: #f76a70 | Text aus Excel: Have a midlife crisis
+[Packs/Roast Friends/Finished/Shave their eyebrows for money.webp] -> [Ziel-ID: card_082.webp] | Match: 75.8% | Hex: #3e4463 | Text aus Excel: Shave their eyebrows for 10,000 bucks
+[Packs/Roast Friends/Finished/Go to the supermarket in underwear for 500 bucks.webp] -> [Ziel-ID: card_083.webp] | Match: 100.0% | Hex: #4b7ab3 | Text aus Excel: Go to the supermarket in underwear for 500 bucks
+[Packs/Roast Friends/Finished/Pee in the sink.webp] -> [Ziel-ID: card_084.webp] | Match: 100.0% | Hex: #009d19 | Text aus Excel: Pee in the sink?
+[Packs/Roast Friends/Finished/Be the biggest nerd at some topic.webp] -> [Ziel-ID: card_085.webp] | Match: 100.0% | Hex: #00b299 | Text aus Excel: Be the biggest nerd at some topic
+[Packs/Roast Friends/Finished/Doodoo in a waterslide for 1000 bucks.webp] -> [Ziel-ID: card_086.webp] | Match: 100.0% | Hex: #b34f2f | Text aus Excel: Doodoo in a waterslide for 1,000 bucks?
+[Packs/Roast Friends/Finished/Who will be first to lose their job to AI.webp] -> [Ziel-ID: card_087.webp] | Match: 100.0% | Hex: #b20050 | Text aus Excel: Who will be first to lose their job to AI
+[Packs/Roast Friends/Finished/Believe crazy conspiracy stuff.webp] -> [Ziel-ID: card_088.webp] | Match: 100.0% | Hex: #403b74 | Text aus Excel: Believe crazy conspiracy stuff
+[Packs/Roast Friends/Finished/Look at themselves in the mirror the most.webp] -> [Ziel-ID: card_089.webp] | Match: 100.0% | Hex: #009454 | Text aus Excel: Look at themselves in the mirror the most
+[Packs/Roast Friends/Finished/Be the worst at raising children.webp] -> [Ziel-ID: card_090.webp] | Match: 100.0% | Hex: #d04646 | Text aus Excel: Be the worst at raising children
+
+### Pack: Toxic Love ###
+[Packs/Toxic Love/Finished/Cheat on a partner.webp] -> [Ziel-ID: card_091.webp] | Match: 100.0% | Hex: #1ea83b | Text aus Excel: Cheat on a partner?
+[Packs/Toxic Love/Finished/Hook up with a friend's ex.webp] -> [Ziel-ID: card_092.webp] | Match: 100.0% | Hex: #69adbc | Text aus Excel: Hook up with a friend's ex?
+[Packs/Toxic Love/Finished/Ghost someone after a great date.webp] -> [Ziel-ID: card_093.webp] | Match: 100.0% | Hex: #fd4f4c | Text aus Excel: Ghost someone after a great date?
+[Packs/Toxic Love/Finished/End a relationship over text.webp] -> [Ziel-ID: card_094.webp] | Match: 100.0% | Hex: #1b3d47 | Text aus Excel: End a relationship over text?
+[Packs/Toxic Love/Finished/Stalk their ex’s new partner on every app.webp] -> [Ziel-ID: card_095.webp] | Match: 100.0% | Hex: #00dae8 | Text aus Excel: Stalk their ex’s new partner on every app?
+[Packs/Toxic Love/Finished/send nudes the fastest.webp] -> [Ziel-ID: card_096.webp] | Match: 100.0% | Hex: #ca4c71 | Text aus Excel: Send nudes the fastest?
+[Packs/Toxic Love/Finished/Call their ex when drunk.webp] -> [Ziel-ID: card_097.webp] | Match: 100.0% | Hex: #fb5638 | Text aus Excel: Call their ex when drunk?
+[Packs/Toxic Love/Finished/Slide into too many DMs with no shame.webp] -> [Ziel-ID: card_098.webp] | Match: 100.0% | Hex: #ad943b | Text aus Excel: Slide into too many DMs with no shame?
+[Packs/Toxic Love/Finished/Double-book dates.webp] -> [Ziel-ID: card_099.webp] | Match: 100.0% | Hex: #41dd17 | Text aus Excel: Double-book dates?
+[Packs/Toxic Love/Finished/Fake their entire personality for one crush.webp] -> [Ziel-ID: card_100.webp] | Match: 100.0% | Hex: #46d464 | Text aus Excel: Fake their entire personality for one crush?
+[Packs/Toxic Love/Finished/Accidentally like an ex’s old profile picture.webp] -> [Ziel-ID: card_101.webp] | Match: 100.0% | Hex: #579c50 | Text aus Excel: Accidentally like an ex’s old profile picture?
+[Packs/Toxic Love/Finished/Lie about their height, age, and job on apps.webp] -> [Ziel-ID: card_102.webp] | Match: 100.0% | Hex: #292d37 | Text aus Excel: Lie about their height, age, and job on apps?
+[Packs/Toxic Love/Finished/Be a catfish on dating apps.webp] -> [Ziel-ID: card_103.webp] | Match: 100.0% | Hex: #eb5e72 | Text aus Excel: Be a catfish on dating apps?
+[Packs/Toxic Love/Finished/Flirt with someone already taken.webp] -> [Ziel-ID: card_104.webp] | Match: 100.0% | Hex: #466072 | Text aus Excel: Flirt with someone already taken?
+[Packs/Toxic Love/Finished/Only date someone for their money.webp] -> [Ziel-ID: card_105.webp] | Match: 100.0% | Hex: #676418 | Text aus Excel: Only date someone for their money?
+[Packs/Toxic Love/Finished/Date someone purely for the Instagram aesthetic.webp] -> [Ziel-ID: card_106.webp] | Match: 100.0% | Hex: #a8701e | Text aus Excel: Date someone purely for the Instagram aesthetic?
+[Packs/Toxic Love/Finished/Text “wyd” at 3 a.m. to the whole roster.webp] -> [Ziel-ID: card_107.webp] | Match: 100.0% | Hex: #db102d | Text aus Excel: Text “wyd” at 3 a.m. to the whole roster?
+[Packs/Toxic Love/Finished/Catch feelings too fast.webp] -> [Ziel-ID: card_108.webp] | Match: 100.0% | Hex: #fe526b | Text aus Excel: Catch feelings too fast?
+[Packs/Toxic Love/Finished/Block their partner during every fight.webp] -> [Ziel-ID: card_109.webp] | Match: 100.0% | Hex: #e9108e | Text aus Excel: Block their partner during every fight?
+[Packs/Toxic Love/Finished/Have the most questionable hookup history.webp] -> [Ziel-ID: card_110.webp] | Match: 100.0% | Hex: #de5480 | Text aus Excel: Have the most questionable hookup history?
+[Packs/Toxic Love/Finished/Fake an illness to get out of a date.webp] -> [Ziel-ID: card_111.webp] | Match: 100.0% | Hex: #3a5a90 | Text aus Excel: Fake an illness to get out of a date?
+[Packs/Toxic Love/Finished/Watch the most adult movies.webp] -> [Ziel-ID: card_112.webp] | Match: 100.0% | Hex: #365e55 | Text aus Excel: Watch the most adult movies?
+[Packs/Toxic Love/Finished/Have a weird kink.webp] -> [Ziel-ID: card_113.webp] | Match: 100.0% | Hex: #ff008a | Text aus Excel: Have a weird kink?
+[Packs/Toxic Love/Finished/Secure a GILF.webp] -> [Ziel-ID: card_114.webp] | Match: 100.0% | Hex: #bd3839 | Text aus Excel: Secure a GILF?
+[Packs/Toxic Love/Finished/Write the weirdest texts on dating apps.webp] -> [Ziel-ID: card_115.webp] | Match: 100.0% | Hex: #db102d | Text aus Excel: Write the weirdest texts on dating apps
+[Packs/Toxic Love/Finished/Use a fruit for pleasure.webp] -> [Ziel-ID: card_116.webp] | Match: 100.0% | Hex: #4386c4 | Text aus Excel: Use a fruit for pleasure
+[Packs/Toxic Love/Finished/Get turned on by a double scooter ride.webp] -> [Ziel-ID: card_117.webp] | Match: 100.0% | Hex: #86b01a | Text aus Excel: Get turned on by a double scooter ride?
+[Packs/Toxic Love/Finished/Spend a night with a ladyboy.webp] -> [Ziel-ID: card_118.webp] | Match: 100.0% | Hex: #0d6162 | Text aus Excel: Spend a night with a ladyboy
+[Packs/Toxic Love/Finished/Hire a stripper for their wedding.webp] -> [Ziel-ID: card_119.webp] | Match: 100.0% | Hex: #f05395 | Text aus Excel: Hire a stripper for their wedding
+[Packs/Toxic Love/Finished/wanna make their ex jealous.webp] -> [Ziel-ID: card_120.webp] | Match: 100.0% | Hex: #ff8200 | Text aus Excel: wanna make their ex jealous?
+
+### Pack: Unhinged Nights ###
+[Packs/Unhinged Nights/Finished/Blackout in a stranger’s bed.webp] -> [Ziel-ID: card_121.webp] | Match: 100.0% | Hex: #161544 | Text aus Excel: Blackout in a stranger’s bed?
+[Packs/Unhinged Nights/Finished/Puke in an Uber.webp] -> [Ziel-ID: card_122.webp] | Match: 100.0% | Hex: #ff7200 | Text aus Excel: Puke in an Uber?
+[Packs/Unhinged Nights/Finished/Dance on the stripper pole in the club.webp] -> [Ziel-ID: card_123.webp] | Match: 100.0% | Hex: #8c2466 | Text aus Excel: Dance on the stripper pole in the club?
+[Packs/Unhinged Nights/Finished/Flash their ass for free drinks.webp] -> [Ziel-ID: card_124.webp] | Match: 100.0% | Hex: #72469b | Text aus Excel: Flash their ass for free drinks?
+[Packs/Unhinged Nights/Finished/Fight a bouncer.webp] -> [Ziel-ID: card_125.webp] | Match: 100.0% | Hex: #d1263e | Text aus Excel: Fight a bouncer?
+[Packs/Unhinged Nights/Finished/Get kicked out of a club.webp] -> [Ziel-ID: card_126.webp] | Match: 100.0% | Hex: #000000 | Text aus Excel: Get kicked out of a club?
+[Packs/Unhinged Nights/Finished/Get arrested for drunk driving.webp] -> [Ziel-ID: card_127.webp] | Match: 100.0% | Hex: #6e8c49 | Text aus Excel: Get arrested for drunk driving?
+[Packs/Unhinged Nights/Finished/Get arrested for public urination.webp] -> [Ziel-ID: card_128.webp] | Match: 100.0% | Hex: #bf9d2e | Text aus Excel: Get arrested for public urination?
+[Packs/Unhinged Nights/Finished/chug a mystery drink from a stranger.webp] -> [Ziel-ID: card_129.webp] | Match: 100.0% | Hex: #7de100 | Text aus Excel: chug a mystery drink from a stranger
+[Packs/Unhinged Nights/Finished/Steal a traffic cone and wear it as a hat.webp] -> [Ziel-ID: card_130.webp] | Match: 100.0% | Hex: #d41c50 | Text aus Excel: Steal a traffic cone and wear it as a hat?
+[Packs/Unhinged Nights/Finished/Kiss multiple people in the club.webp] -> [Ziel-ID: card_131.webp] | Match: 100.0% | Hex: #464d77 | Text aus Excel: Kiss multiple people in the club?
+[Packs/Unhinged Nights/Finished/Go home with a 210.webp] -> [Ziel-ID: card_132.webp] | Match: 97.3% | Hex: #d4501c | Text aus Excel: Go home with a 2/10?
+[Packs/Unhinged Nights/Finished/Make a fool of themselves at karaoke.webp] -> [Ziel-ID: card_133.webp] | Match: 100.0% | Hex: #ba42bd | Text aus Excel: Make a fool of themselves at karaoke?
+[Packs/Unhinged Nights/Finished/Dance on the table.webp] -> [Ziel-ID: card_134.webp] | Match: 100.0% | Hex: #38605f | Text aus Excel: Dance on the table?
+[Packs/Unhinged Nights/Finished/Funnel a beer to start the night.webp] -> [Ziel-ID: card_135.webp] | Match: 100.0% | Hex: #2773cb | Text aus Excel: Funnel a beer to start the night?
+[Packs/Unhinged Nights/Finished/Get really aggressive when drunk.webp] -> [Ziel-ID: card_136.webp] | Match: 100.0% | Hex: #1dad2e | Text aus Excel: Get really aggressive when drunk?
+[Packs/Unhinged Nights/Finished/Attempt parkour at 2 am.webp] -> [Ziel-ID: card_137.webp] | Match: 100.0% | Hex: #1c6252 | Text aus Excel: Attempt parkour at 2 am?
+[Packs/Unhinged Nights/Finished/hook up in a club toilet.webp] -> [Ziel-ID: card_138.webp] | Match: 100.0% | Hex: #7d0085 | Text aus Excel: hook up in a club toilet
+[Packs/Unhinged Nights/Finished/Land in the emergency room.webp] -> [Ziel-ID: card_139.webp] | Match: 100.0% | Hex: #2051b3 | Text aus Excel: Land in the emergency room?
+[Packs/Unhinged Nights/Finished/Let someone piss on your shoe for 500.webp] -> [Ziel-ID: card_140.webp] | Match: 98.7% | Hex: #754940 | Text aus Excel: Let someone piss on your shoe for $500?
+[Packs/Unhinged Nights/Finished/willingly have the biggest bill in the club.webp] -> [Ziel-ID: card_141.webp] | Match: 100.0% | Hex: #383d8c | Text aus Excel: willingly have the biggest bill in the club?
+[Packs/Unhinged Nights/Finished/Spend the least money the whole night.webp] -> [Ziel-ID: card_142.webp] | Match: 100.0% | Hex: #c9019c | Text aus Excel: Spend the least money the whole night?
+[Packs/Unhinged Nights/Finished/Steal at a house party.webp] -> [Ziel-ID: card_143.webp] | Match: 100.0% | Hex: #a33939 | Text aus Excel: Steal at a house party?
+[Packs/Unhinged Nights/Finished/Work under the influence.webp] -> [Ziel-ID: card_144.webp] | Match: 100.0% | Hex: #08c2b7 | Text aus Excel: Work under the influence?
+[Packs/Unhinged Nights/Finished/Smoke the most cigarettes.webp] -> [Ziel-ID: card_145.webp] | Match: 100.0% | Hex: #4256de | Text aus Excel: Smoke the most cigarettes
+[Packs/Unhinged Nights/Finished/Tackle a table.webp] -> [Ziel-ID: card_146.webp] | Match: 100.0% | Hex: #233f5a | Text aus Excel: Tackle a table
+[Packs/Unhinged Nights/Finished/destroy a car mirror for fun.webp] -> [Ziel-ID: card_147.webp] | Match: 100.0% | Hex: #875a8d | Text aus Excel: destroy a car mirror for fun
+[Packs/Unhinged Nights/Finished/always get drunk the fastest.webp] -> [Ziel-ID: card_148.webp] | Match: 100.0% | Hex: #007165 | Text aus Excel: always get drunk the fastest
+[Packs/Unhinged Nights/Finished/go on a complete binge when the night ends.webp] -> [Ziel-ID: card_149.webp] | Match: 100.0% | Hex: #46091b | Text aus Excel: go on a complete binge when the night ends
+[Packs/Unhinged Nights/Finished/spend the most time to look good for the party.webp] -> [Ziel-ID: card_150.webp] | Match: 100.0% | Hex: #31a09c | Text aus Excel: spend the most time to look good for the party
+
+----------------------------------------------------------------------------------------------------
+WARNUNGEN
+----------------------------------------------------------------------------------------------------
+  Keine Warnungen - alle Karten haben eine gute Bild-Zuordnung.
+
+----------------------------------------------------------------------------------------------------
+NICHT ZUGEORDNETE BILDER (0)
+----------------------------------------------------------------------------------------------------
+  Alle gefundenen Bilder wurden einer Karte zugeordnet.
+
+====================================================================================================
+Dies ist ein DRY RUN. Es wurden KEINE Dateien kopiert oder veraendert.
+Wenn die Zuordnung oben passt, fuehre das Skript erneut mit '--execute' aus.
+====================================================================================================

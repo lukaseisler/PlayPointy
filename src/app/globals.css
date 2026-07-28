@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f4f5;
+  --foreground: #171717;
+  --font-fredoka: "Fredoka", sans-serif;
+  --font-oswald: "Oswald", sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-fredoka);
+  /* Erzeugt die Tailwind-Utility `font-oswald` fuer den Pack-Namen. */
+  --font-oswald: var(--font-oswald);
+}
+
+/* `overflow: hidden` reicht aus, um Rubber-Band-Scrolling zu verhindern.
+   Absichtlich KEIN zusaetzliches `position: fixed` auf html/body: PhoneFrame
+   setzt bereits selbst `fixed inset-0 h-dvh` auf seinen eigenen Wrapper-Div.
+   Ein doppeltes `position: fixed` (Body + PhoneFrame uebereinander) ist eine
+   bekannte Ursache fuer kaputte Touch-/Scroll-Weiterleitung auf mobilen
+   WebKit/Blink-Browsern (die Seite wirkt dann eingefroren, obwohl React
+   laeuft) - daher bewusst nur auf dem inneren Frame, nicht auf body/html. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-fredoka);
+}
+
+/* Kein Text markierbar/kopierbar im Spielbereich – fühlt sich mehr wie eine App an. */
+.game-surface {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
