@@ -1,0 +1,46 @@
+# Deploy OpenNext build to Cloudflare Pages with Wrangler 4.x
+#
+# Cloudflare Pages *Git* builds compile `_worker.js` with a pinned Wrangler
+# 3.114.17, which miscompiles OpenNext 1.19+ workers and causes Internal
+# Server Error (500) on the first request. Deploying via this workflow uses
+# the project's Wrangler (>= 4.33) instead and avoids that bug.
+#
+# Required repo secrets:
+#   CLOUDFLARE_API_TOKEN   – API token with Pages Edit
+#   CLOUDFLARE_ACCOUNT_ID  – Cloudflare account id
+#
+# In the Cloudflare Pages project: disable automatic Git deployments
+# (Settings → Builds → stop auto deploy), so only this workflow publishes.
+
+name: Deploy Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for Cloudflare Pages
+        run: npm run pages:build
+
+      - name: Deploy with Wrangler 4+
+        run: npx wrangler pages deploy .open-next --project-name=playpointy --branch=main --commit-dirty=true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
