@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
   // 192.168.178.155"), was genau erklaert, warum jeder App-Code-Fix auf
   // localhost im Test funktionierte, auf dem echten Handy aber nie half.
   allowedDevOrigins: ["192.168.178.155", "192.168.178.*"],
+  // Lokale WebPs direkt ausliefern – vermeidet `/_next/image`-404er auf
+  // Cloudflare ohne aktiviertes Cloudflare Images Produkt.
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;
+
+import("@opennextjs/cloudflare").then((m) => m.initOpenNextCloudflareForDev());

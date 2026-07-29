@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PlayPointy
 
-## Getting Started
+Who is more likely to… — party card game as a PWA.
 
-First, run the development server:
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Cloudflare deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This app uses [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare) so Next.js (App Router, `force-dynamic`) runs correctly on Cloudflare Workers/Pages.
 
-## Learn More
+**Workers Builds** (GitHub connected) — set:
 
-To learn more about Next.js, take a look at the following resources:
+| Setting | Value |
+| --- | --- |
+| Build command | `npx @opennextjs/cloudflare build` |
+| Deploy command | `npx @opennextjs/cloudflare deploy` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Do **not** set the build output to `.next` — that causes the classic Cloudflare 404.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Local preview / deploy:
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run preview   # build + local Workers runtime
+npm run deploy    # build + deploy to Cloudflare
+```
