@@ -67,6 +67,7 @@ const routes = {
   exclude: [
     "/_next/static/*",
     "/cards/*",
+    "/og/*",
     "/favicon.ico",
     "/logo.png",
     "/playpointyapplogo.png",

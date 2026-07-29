@@ -10,7 +10,13 @@ import {
   getCardsForPack,
   getStorePacks,
 } from "@/lib/data";
-import { absoluteCardImageUrl, buildShareUrl, cardTextWithoutQuestion } from "@/lib/share";
+import {
+  OG_SHARE_TITLE,
+  SITE_URL,
+  absoluteOgImageUrl,
+  buildShareUrl,
+  cardTextWithoutQuestion,
+} from "@/lib/share";
 import { shuffle } from "@/lib/shuffle";
 
 export const dynamic = "force-dynamic";
@@ -26,17 +32,20 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
     return { title: "PlayPointy" };
   }
 
-  const title = displayTitle(card.text);
-  const description = cardTextWithoutQuestion(card.text);
-  const image = absoluteCardImageUrl(card);
+  // Title = Hook, Description = Kartentext (nicht doppelt denselben String).
+  const ogTitle = OG_SHARE_TITLE;
+  const ogDescription = cardTextWithoutQuestion(card.text);
+  const image = absoluteOgImageUrl(card);
   const url = buildShareUrl(card);
+  const pageTitle = `${displayTitle(card.text)} | PlayPointy`;
 
   return {
-    title: `${title} | PlayPointy`,
-    description,
+    metadataBase: new URL(SITE_URL),
+    title: pageTitle,
+    description: ogDescription,
     openGraph: {
-      title,
-      description,
+      title: ogTitle,
+      description: ogDescription,
       url,
       type: "website",
       siteName: "PlayPointy",
@@ -44,17 +53,19 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
         ? [
             {
               url: image,
+              secureUrl: image,
+              type: "image/jpeg",
               width: 800,
               height: 1000,
-              alt: title,
+              alt: displayTitle(card.text),
             },
           ]
         : [],
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
+      title: ogTitle,
+      description: ogDescription,
       images: image ? [image] : [],
     },
   };

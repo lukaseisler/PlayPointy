@@ -25,14 +25,26 @@ export function buildShareMessage(card: Card): string {
   return `That's so you haha 😂\n\n${cardTextWithoutQuestion(card.text)}\n\n${buildShareUrl(card)}`;
 }
 
+/** Hook-Zeile für og:title – getrennt vom Kartentext in og:description. */
+export const OG_SHARE_TITLE = "That's so you haha 😂";
+
 /**
- * Absolute R2-Bild-URL für Open-Graph / WhatsApp-Previews.
- * `card.image` ist lokal `cards/card_001.webp` → `https://r2.playpointy.com/cards/card_001.webp`
+ * Absolute JPEG-URL für Open-Graph / WhatsApp.
+ *
+ * Warum nicht R2-WebP:
+ * - `r2.playpointy.com` hat derzeit keinen DNS-Eintrag → Crawler laden nichts
+ * - WhatsApp rendert RGBA-WebP unzuverlässig → leere Vorschau
+ *
+ * JPEGs liegen unter `/og/card_XXX.jpg` (gleiche Origin wie die Seite).
  */
-export function absoluteCardImageUrl(card: Card): string | null {
+export function absoluteOgImageUrl(card: Card): string | null {
   if (!card.image) return null;
-  const filename = card.image.replace(/^cards\//, "");
-  return `${R2_CARDS_BASE}/${filename}`;
+  return `${SITE_URL}/og/${card.id}.jpg`;
+}
+
+/** @deprecated Prefer absoluteOgImageUrl for social previews. */
+export function absoluteCardImageUrl(card: Card): string | null {
+  return absoluteOgImageUrl(card);
 }
 
 export type ShareResult = "shared" | "copied" | "cancelled" | "failed";
