@@ -22,6 +22,20 @@ export const metadata: Metadata = {
   title: "PlayPointy - Who is more likely to...",
   description:
     "The ultimate party card game for your group. No download, no account – just play.",
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Play Pointy",
+    statusBarStyle: "default",
+  },
 };
 
 export const viewport: Viewport = {
@@ -41,8 +55,11 @@ export default function RootLayout({
     <html lang="en" className={`${fredoka.variable} ${oswald.variable} h-full antialiased`}>
       <head>
         {/* PWA-Basis: erlaubt "Add to Home Screen" auf Mobilgeraeten, damit
-            das Spiel im Vollbild (ohne Browser-Chrome) laufen kann. */}
+            das Spiel im Vollbild (ohne Browser-Chrome) laufen kann.
+            Icons/Manifest kommen primaer aus `metadata` oben; Link bleibt
+            als Fallback fuer aeltere Clients. */}
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="h-full min-h-dvh bg-neutral-950 font-sans">
         {/* Ausserhalb von PhoneFrame's `overflow-hidden`-Containern gemountet,
