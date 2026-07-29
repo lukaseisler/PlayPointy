@@ -1,12 +1,15 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"main": ".open-next/worker.js",
 	"name": "playpointy",
 	"compatibility_date": "2026-07-29",
 	"compatibility_flags": [
 		"nodejs_compat",
 		"global_fetch_strictly_public"
 	],
+	// Cloudflare Pages: Build-Output-Root (nach `npm run pages:build`)
+	"pages_build_output_dir": ".open-next",
+	// Cloudflare Workers / `opennextjs-cloudflare deploy` (unverändertes OpenNext-Layout)
+	"main": ".open-next/worker.js",
 	"assets": {
 		"directory": ".open-next/assets",
 		"binding": "ASSETS"

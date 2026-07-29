@@ -11,22 +11,30 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Cloudflare deploy
+## Cloudflare Pages (playpointy.pages.dev / playpointy.com)
 
-This app uses [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare) so Next.js (App Router, `force-dynamic`) runs correctly on Cloudflare Workers/Pages.
+OpenNext baut im **Workers**-Layout (`worker.js` + `assets/`). Cloudflare Pages braucht dagegen `_worker.js` und die statischen Dateien im **Output-Root**, sonst 404 für `/_next/*` und `/cards/*`.
 
-**Workers Builds** (GitHub connected) — set:
+`npm run pages:build` macht beides (OpenNext-Build + Prepare-Schritt).
+
+**Pages Build-Einstellungen** (Dashboard → Project → Settings → Builds):
 
 | Setting | Value |
 | --- | --- |
-| Build command | `npx @opennextjs/cloudflare build` |
-| Deploy command | `npx @opennextjs/cloudflare deploy` |
+| Build command | `npm run pages:build` |
+| Build output directory | `.open-next` |
+| Root directory | `/` |
 
-Do **not** set the build output to `.next` — that causes the classic Cloudflare 404.
+Compatibility flags: `nodejs_compat` (und idealerweise `global_fetch_strictly_public`).
 
-Local preview / deploy:
+Manuell deployen:
 
 ```bash
-npm run preview   # build + local Workers runtime
-npm run deploy    # build + deploy to Cloudflare
+npm run pages:deploy
+```
+
+## Cloudflare Workers (Alternative)
+
+```bash
+npm run deploy
 ```
