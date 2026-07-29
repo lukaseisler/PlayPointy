@@ -6,14 +6,12 @@
 		"nodejs_compat",
 		"global_fetch_strictly_public"
 	],
-	// Cloudflare Pages: Build-Output-Root (nach `npm run pages:build`)
+	// Cloudflare Pages Output nach `npm run pages:build`
 	"pages_build_output_dir": ".open-next",
-	// Cloudflare Workers / `opennextjs-cloudflare deploy` (unverändertes OpenNext-Layout)
-	"main": ".open-next/worker.js",
-	"assets": {
-		"directory": ".open-next/assets",
-		"binding": "ASSETS"
-	},
+	// KEIN `assets.binding: "ASSETS"` — der Name ist in Pages-Projekten
+	// reserviert (Platform stellt ASSETS automatisch bereit). Explizites
+	// Binding blockiert den Build mit:
+	// "The name 'ASSETS' is reserved in Pages projects."
 	"services": [
 		{
 			// Self-reference service binding, the service name must match the worker name
