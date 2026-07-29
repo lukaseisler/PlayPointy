@@ -2,14 +2,17 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "playpointy",
 	"compatibility_date": "2026-07-29",
+	// Node.js-APIs fuer OpenNext/Next.js Server Components (process, Buffer, …).
+	// `nodejs_compat` ist Pflicht ab compatibility_date >= 2024-09-23.
+	// `nodejs_compat_populate_process_env` macht Cloudflare-Env-Vars als
+	// process.env in Server Components verfuegbar.
 	"compatibility_flags": [
 		"nodejs_compat",
+		"nodejs_compat_populate_process_env",
 		"global_fetch_strictly_public"
 	],
 	// Cloudflare Pages Output nach `npm run pages:build`
 	"pages_build_output_dir": ".open-next"
-	// KEIN `assets.binding: "ASSETS"` — in Pages reserviert (Platform stellt es bereit).
-	// KEIN `services.WORKER_SELF_REFERENCE` — verweist auf Worker "playpointy",
-	// der bei Pages-Erstdeploys nicht existiert und den Build abbricht.
-	// Self-Reference wird erst fuer OpenNext-Caching/Queue benoetigt (R2 etc.).
+	// KEIN `assets.binding: "ASSETS"` — in Pages reserviert.
+	// KEIN `services.WORKER_SELF_REFERENCE` — blockiert Pages-Erstdeploy.
 }
