@@ -1,46 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CardStack from "./CardStack";
 import GameCard from "./GameCard";
 import PWANudge from "./PWANudge";
 import StoreModal, { type StoreReason } from "./StoreModal";
+import { readActivePackIds, writeActivePackIds } from "@/lib/activePacks";
+import { FREE_PACK_ID, getCardsForPacks } from "@/lib/data";
 import { shuffle } from "@/lib/shuffle";
 import type { Card, PackSummary } from "@/lib/types";
 
 interface GameProps {
   initialCards: Card[];
   storePacks: PackSummary[];
+  /** Geteilte Karte: wird zuerst gezeigt, danach Queue der aktiven Packs. */
+  featuredCard?: Card | null;
+}
+
+function buildDeck(packIds: string[], featured?: Card | null): Card[] {
+  const pool = getCardsForPacks(packIds);
+  if (!featured) return shuffle(pool);
+  return [featured, ...shuffle(pool.filter((c) => c.id !== featured.id))];
+}
+
+function withFeaturedFirst(cards: Card[], featured?: Card | null): Card[] {
+  if (!featured) return cards;
+  return [featured, ...cards.filter((c) => c.id !== featured.id)];
 }
 
 /**
- * Orchestriert das gesamte Free-Pack-Gameplay:
- * - hält die (server-seitig gemischte) Kartenreihenfolge + aktuellen Index
- * - Swipe links -> nächste Karte, nach letzter Karte -> Store-Modal (Free-Limit)
- * - Swipe rechts -> vorherige Karte
- * - "All Packs"-Button auf der Karte -> Store-Modal (manuell geöffnet)
+ * Orchestriert das Gameplay:
+ * - hält die Kartenreihenfolge + aktuellen Index
+ * - optional featuredCard (Share-Link): Viral Loop → danach aktive Packs
+ * - Swipe links -> nächste Karte, nach letzter Karte -> Store-Modal
+ * - Swipe rechts -> vorherige Karte (auf Index 0: nächste, nahtlos weiter)
  */
-export default function Game({ initialCards, storePacks }: GameProps) {
-  // `initialCards` kommt bereits server-seitig gemischt aus `app/page.tsx`
-  // (siehe `shuffle(getCardsForPack(...))` dort) - es gibt daher KEINEN
-  // client-seitigen Misch-Schritt mehr nach dem Mount. Server-HTML und
-  // Client-State sind von Anfang an identisch: kein zweiter Render-Pass, der
-  // die sichtbare Karte aendert, und damit kein Hydration-Mismatch mehr.
-  const [cards, setCards] = useState<Card[]>(initialCards);
+export default function Game({ initialCards, storePacks, featuredCard = null }: GameProps) {
+  const [cards, setCards] = useState<Card[]>(() => withFeaturedFirst(initialCards, featuredCard));
   const [index, setIndex] = useState(0);
   const [storeReason, setStoreReason] = useState<StoreReason | null>(null);
-  // PWA-Install-Hinweis: taucht genau einmal nach Karte 15 auf, es sei denn
-  // der Nutzer hat ihn vorher schon manuell weggeklickt.
   const [pwaNudgeDismissed, setPwaNudgeDismissed] = useState(false);
+  const [activePackIds, setActivePackIds] = useState<string[]>([FREE_PACK_ID]);
+
+  // Nach Mount: aktive Packs aus localStorage → Deck neu bauen (Gäste = Starter,
+  // Wiederkehrer = gespeicherte Packs). Featured bleibt Index 0.
+  useEffect(() => {
+    const packIds = readActivePackIds();
+    setActivePackIds(packIds);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- client deck from localStorage after SSR seed
+    setCards(buildDeck(packIds, featuredCard));
+    setIndex(0);
+  }, [featuredCard]);
 
   const total = cards.length;
   const current = cards[index];
-  // FOMO-Zaehler: zeigt nicht nur die 30 Karten des Free-Packs, sondern die
-  // GESAMTE Kartenanzahl ueber alle Packs hinweg - macht sichtbar, wie viel
-  // Inhalt im Deck Manager noch wartet. `storePacks` enthaelt inzwischen
-  // ALLE Packs (inkl. Starter-Pack, siehe `getStorePacks()` in page.tsx),
-  // daher NICHT mehr zusaetzlich `initialCards.length` addieren - das wuerde
-  // das Starter-Pack doppelt zaehlen.
   const totalAcrossAllPacks = storePacks.reduce((sum, pack) => sum + pack.cardCount, 0);
 
   function handleSwipeLeft() {
@@ -52,18 +65,20 @@ export default function Game({ initialCards, storePacks }: GameProps) {
   }
 
   function handleSwipeRight() {
-    // Sonderfall erste Karte: Es gibt noch nichts, wovon man "zurueck"
-    // koennte - ein Rechts-Swipe auf Karte 1 verhaelt sich deshalb
-    // identisch zu Links (naechste Karte).
     if (index === 0) {
-      setIndex(1);
+      if (total > 1) setIndex(1);
       return;
     }
     setIndex((i) => Math.max(0, i - 1));
   }
 
+  function handleActivePacksChange(next: string[]) {
+    setActivePackIds(next);
+    writeActivePackIds(next);
+  }
+
   function handleReshuffle() {
-    setCards((prev) => shuffle(prev));
+    setCards(buildDeck(activePackIds, null));
     setIndex(0);
     setStoreReason(null);
   }
@@ -97,6 +112,8 @@ export default function Game({ initialCards, storePacks }: GameProps) {
         open={storeReason !== null}
         reason={storeReason ?? "manual"}
         packs={storePacks}
+        activePackIds={activePackIds}
+        onActivePacksChange={handleActivePacksChange}
         onClose={() => setStoreReason(null)}
         onReshuffle={handleReshuffle}
       />

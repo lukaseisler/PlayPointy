@@ -3,8 +3,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { displayTitle } from "@/lib/data";
+import { shareCard } from "@/lib/share";
 import type { Card } from "@/lib/types";
 
 interface GameCardProps {
@@ -13,19 +14,6 @@ interface GameCardProps {
   index: number;
   total: number;
   onOpenStore: () => void;
-}
-
-function shareCard(card: Card) {
-  const text = `${displayTitle(card.text)} 😂`;
-  const url = typeof window !== "undefined" ? window.location.href : "https://playpointy.com";
-
-  if (typeof navigator !== "undefined" && navigator.share) {
-    navigator.share({ text, url }).catch(() => {
-      /* Nutzer hat den Share-Dialog abgebrochen - kein Fehlerfall. */
-    });
-  } else if (typeof navigator !== "undefined" && navigator.clipboard) {
-    navigator.clipboard.writeText(`${text} ${url}`).catch(() => {});
-  }
 }
 
 /**
@@ -39,6 +27,18 @@ function shareCard(card: Card) {
 export default function GameCard({ card, position, index, total, onOpenStore }: GameCardProps) {
   const accent = card.hex;
   const [infoOpen, setInfoOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = window.setTimeout(() => setToast(null), 1800);
+    return () => window.clearTimeout(t);
+  }, [toast]);
+
+  async function handleShare() {
+    const result = await shareCard(card);
+    if (result === "copied") setToast("Copied to clipboard");
+  }
 
   return (
     // `h-full w-full`: füllt den Phone-Frame komplett. Header und Footer
@@ -199,7 +199,9 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
           <button
             type="button"
             onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => shareCard(card)}
+            onClick={() => {
+              void handleShare();
+            }}
             className="pointer-events-auto relative z-50 min-w-0 flex-1 cursor-pointer rounded-full border-2 bg-white py-3 text-center text-lg font-semibold transition-colors duration-500"
             style={{ borderColor: accent, color: accent }}
           >
@@ -207,6 +209,22 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
           </button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            className="pointer-events-none absolute inset-x-0 bottom-24 z-[60] flex justify-center px-6"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.2 }}
+          >
+            <span className="rounded-full bg-neutral-900/90 px-4 py-2 text-sm font-medium text-white shadow-lg">
+              {toast}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

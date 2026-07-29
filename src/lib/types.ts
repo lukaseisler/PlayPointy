@@ -10,6 +10,8 @@ export interface Card {
   matched: boolean;
   matchScore: number;
   excelRow: number;
+  /** Dauerhafter 3-stelliger Share-Code für /c/[packId]/[shareCode]. */
+  shareCode: string;
 }
 
 /** Ein Pack, wie es von process_cards.py in public/packs.json geschrieben wird. */

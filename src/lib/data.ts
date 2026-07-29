@@ -30,6 +30,16 @@ export function getCardsForPack(packId: string): Card[] {
     .filter((c): c is Card => Boolean(c));
 }
 
+/** Karte anhand Pack-Slug + 3-stelligem Share-Code (Share-URL). */
+export function getCardByPackAndCode(packId: string, code: string): Card | undefined {
+  return allCards.find((c) => c.packId === packId && c.shareCode === code);
+}
+
+/** Alle Karten der angegebenen Packs (Reihenfolge der Pack-IDs, dann cardIds). */
+export function getCardsForPacks(packIds: string[]): Card[] {
+  return packIds.flatMap((id) => getCardsForPack(id));
+}
+
 /**
  * Baut die Pack-Liste für den Store: Name, Kartenanzahl, Akzentfarbe (erste
  * Karte) und Vorschaubild. Ohne `excludePackId` sind ALLE Packs enthalten

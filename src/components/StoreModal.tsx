@@ -2,8 +2,8 @@
 
 import { AnimatePresence, motion, useAnimation, useDragControls } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
 import type { PackSummary } from "@/lib/types";
+import { FREE_PACK_ID } from "@/lib/data";
 
 export type StoreReason = "limit" | "manual";
 
@@ -11,45 +11,44 @@ interface StoreModalProps {
   open: boolean;
   reason: StoreReason;
   packs: PackSummary[];
+  activePackIds: string[];
+  onActivePacksChange: (ids: string[]) => void;
   onClose: () => void;
   onReshuffle: () => void;
 }
-
-const FREE_PACK_ID = "starter-chaos";
 
 /**
  * "Deck Manager"-Popup: verwaltet, welche Packs aktiv sind, und bietet die
  * weiteren (noch nicht freigeschalteten) Packs zum Kauf an (UI-Text bewusst
  * komplett auf Englisch).
  *
- * Aktuell nur als UI-Platzhalter: der Preis-Button löst noch keinen echten
- * Stripe-Checkout aus, und der An/Aus-Toggle fuer das Starter-Pack ist reiner
- * lokaler Mock-State (folgt in einem späteren Schritt einer echten Deck-
- * Verwaltung).
+ * Aktive Packs werden vom Parent gesteuert und in localStorage persistiert.
+ * Preis-Button ist noch UI-Platzhalter (kein Stripe-Checkout).
  */
-export default function StoreModal({ open, reason, packs, onClose, onReshuffle }: StoreModalProps) {
+export default function StoreModal({
+  open,
+  reason,
+  packs,
+  activePackIds,
+  onActivePacksChange,
+  onClose,
+  onReshuffle,
+}: StoreModalProps) {
   const dragControls = useDragControls();
-  const [activePacks, setActivePacks] = useState<string[]>([FREE_PACK_ID]);
-  // Kurzer Fehler-Wackler auf dem Toggle, wenn der Nutzer versucht das
-  // letzte verbleibende aktive Pack zu deaktivieren - man braucht immer
-  // mindestens ein aktives Pack, sonst gaebe es nichts mehr zu spielen.
   const wiggleControls = useAnimation();
 
   function toggleActive(id: string) {
-    setActivePacks((prev) => {
-      const isActive = prev.includes(id);
-      if (isActive && prev.length === 1) {
-        // Kurzes haptisches Fehler-Muster (falls vom Geraet/Browser
-        // unterstuetzt) begleitet das visuelle Wackeln - macht die Ablehnung
-        // auch fuehlbar, nicht nur sichtbar.
-        if (typeof navigator !== "undefined" && navigator.vibrate) {
-          navigator.vibrate([40, 50, 40]);
-        }
-        wiggleControls.start({ x: [-4, 4, -4, 4, 0], transition: { duration: 0.3 } });
-        return prev;
+    const isActive = activePackIds.includes(id);
+    if (isActive && activePackIds.length === 1) {
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        navigator.vibrate([40, 50, 40]);
       }
-      return isActive ? prev.filter((p) => p !== id) : [...prev, id];
-    });
+      void wiggleControls.start({ x: [-4, 4, -4, 4, 0], transition: { duration: 0.3 } });
+      return;
+    }
+    onActivePacksChange(
+      isActive ? activePackIds.filter((p) => p !== id) : [...activePackIds, id],
+    );
   }
 
   return (
@@ -127,7 +126,7 @@ export default function StoreModal({ open, reason, packs, onClose, onReshuffle }
             <div className="flex flex-col">
               {packs.map((pack, idx) => {
                 const isFreePack = pack.id === FREE_PACK_ID;
-                const isActive = activePacks.includes(pack.id);
+                const isActive = activePackIds.includes(pack.id);
                 return (
                   // `border-b`-Klassen ersetzt durch eine hartcodierte 1px-DOM-
                   // Linie UNTER der Zeile (statt als Border AUF der Zeile) -
