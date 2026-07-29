@@ -11,11 +11,11 @@ import {
   getStorePacks,
 } from "@/lib/data";
 import {
+  OG_SHARE_DESCRIPTION,
   OG_SHARE_TITLE,
   SITE_URL,
   absoluteOgImageUrl,
   buildShareUrl,
-  cardTextWithoutQuestion,
 } from "@/lib/share";
 import { shuffle } from "@/lib/shuffle";
 
@@ -32,9 +32,9 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
     return { title: "PlayPointy" };
   }
 
-  // Title = Hook, Description = Kartentext (nicht doppelt denselben String).
+  // Title = Produkt-Hook (größer in WhatsApp), Description = Brand-Domain.
   const ogTitle = OG_SHARE_TITLE;
-  const ogDescription = cardTextWithoutQuestion(card.text);
+  const ogDescription = OG_SHARE_DESCRIPTION;
   const image = absoluteOgImageUrl(card);
   const url = buildShareUrl(card);
   const pageTitle = `${displayTitle(card.text)} | PlayPointy`;

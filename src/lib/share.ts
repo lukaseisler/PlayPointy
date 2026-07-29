@@ -19,14 +19,15 @@ export function buildShareUrl(card: Card): string {
 
 /**
  * Share-Nachricht laut Product Spec:
- * "That's so you haha 😂\n\n[Kartentext ohne ?]\n\n[LINK]"
+ * "That's so you haha! 😂\n\n[Kartentext]:\n[LINK]"
  */
 export function buildShareMessage(card: Card): string {
-  return `That's so you haha 😂\n\n${cardTextWithoutQuestion(card.text)}\n\n${buildShareUrl(card)}`;
+  return `That's so you haha! 😂\n\n${cardTextWithoutQuestion(card.text)}:\n${buildShareUrl(card)}`;
 }
 
-/** Hook-Zeile für og:title – getrennt vom Kartentext in og:description. */
-export const OG_SHARE_TITLE = "That's so you haha 😂";
+/** OG-Vorschau: Title prominent, Domain als Description (kein Kartentext-Doppel). */
+export const OG_SHARE_TITLE = "Party Card Game!";
+export const OG_SHARE_DESCRIPTION = "playpointy.com";
 
 /**
  * Absolute JPEG-URL für Open-Graph / WhatsApp.
