@@ -5,6 +5,7 @@ import CardStack from "./CardStack";
 import GameCard from "./GameCard";
 import PWANudge from "./PWANudge";
 import StoreModal, { type StoreReason } from "./StoreModal";
+import { useIsStandalonePwa } from "@/hooks/useIsStandalonePwa";
 import { readActivePackIds, writeActivePackIds } from "@/lib/activePacks";
 import { FREE_PACK_ID, getCardsForPacks } from "@/lib/data";
 import { shuffle } from "@/lib/shuffle";
@@ -41,6 +42,7 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
   const [storeReason, setStoreReason] = useState<StoreReason | null>(null);
   const [pwaNudgeDismissed, setPwaNudgeDismissed] = useState(false);
   const [activePackIds, setActivePackIds] = useState<string[]>([FREE_PACK_ID]);
+  const isStandalonePwa = useIsStandalonePwa();
 
   // Nach Mount: aktive Packs aus localStorage → Deck neu bauen (Gäste = Starter,
   // Wiederkehrer = gespeicherte Packs). Featured bleibt Index 0.
@@ -104,7 +106,7 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
       />
 
       <PWANudge
-        open={index === 15 && !pwaNudgeDismissed}
+        open={index === 15 && !pwaNudgeDismissed && !isStandalonePwa}
         onClose={() => setPwaNudgeDismissed(true)}
       />
 

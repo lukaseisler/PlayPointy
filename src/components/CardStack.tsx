@@ -2,6 +2,7 @@
 
 import { animate, motion, useMotionValue, useTransform, type PanInfo } from "framer-motion";
 import { useRef } from "react";
+import { useIsStandalonePwa } from "@/hooks/useIsStandalonePwa";
 import type { Card } from "@/lib/types";
 
 interface CardStackProps {
@@ -53,6 +54,7 @@ export default function CardStack({
   const showNext = useTransform(x, (v) => (v > 0 ? 0 : 1));
   const showPrev = useTransform(x, (v) => (v > 0 ? 1 : 0));
   const isFlying = useRef(false);
+  const isStandalonePwa = useIsStandalonePwa();
 
   const current = cards[index];
   const next = cards[index + 1];
@@ -64,19 +66,9 @@ export default function CardStack({
   const prev = cards[prevIndex];
 
   function handleDragEnd(_event: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) {
-    // Swipe hoch/runter steuert den nativen Vollbildmodus - unabhaengig vom
-    // aktuellen Karten-Index, jederzeit waehrend des Spiels nutzbar. Early
-    // Return in BEIDEN Faellen (direkt nach dem `setTimeout`, nicht darin):
-    // die Karte soll dabei NICHT wie bei Links/Rechts abgeworfen werden,
-    // sondern (dank `dragConstraints`/`dragElastic` auf y) sofort elastisch
-    // in die Mitte zurueckschnappen. Der eigentliche Fullscreen-Wechsel wird
-    // um 450ms verzoegert (vorher 350ms, davor 250ms - stufenweise erhoeht,
-    // um dem Browser maximalen Puffer fuer den Layout-Shift zu geben), damit
-    // dieser Snap-back inkl. Spring-Ausschwingen VOLLSTAENDIG abgeschlossen
-    // ist, BEVOR der Browser den intensiven Layout-Shift fuer den
-    // Fullscreen-Wechsel ausfuehrt - sonst ueberlagern sich beide
-    // Animationen und es ruckelt sichtbar.
-    if (info.offset.y < -100) {
+    // Swipe hoch/runter steuert den nativen Vollbildmodus - nicht in der
+    // installierten PWA (dort laeuft die App bereits ohne Browser-Chrome).
+    if (!isStandalonePwa && info.offset.y < -100) {
       setTimeout(() => {
         try {
           document.documentElement.requestFullscreen().catch(() => {});
@@ -86,7 +78,7 @@ export default function CardStack({
       }, 450);
       return;
     }
-    if (info.offset.y > 100) {
+    if (!isStandalonePwa && info.offset.y > 100) {
       setTimeout(() => {
         try {
           document.exitFullscreen().catch(() => {});
@@ -177,11 +169,19 @@ export default function CardStack({
         // totem Winkel. `dragConstraints`/`dragElastic` fuer top/bottom
         // sorgen dafuer, dass die Karte nach dem Loslassen (in JEDEM Fall)
         // elastisch in die Mitte zurueckschnappt statt zu "kleben".
-        drag
+        drag={isStandalonePwa ? "x" : true}
         dragDirectionLock={true}
-        dragElastic={{ left: 0.6, right: 0.6, top: 0.4, bottom: 0.4 }}
+        dragElastic={
+          isStandalonePwa
+            ? 0.6
+            : { left: 0.6, right: 0.6, top: 0.4, bottom: 0.4 }
+        }
         dragMomentum={false}
-        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+        dragConstraints={
+          isStandalonePwa
+            ? { left: 0, right: 0 }
+            : { left: 0, right: 0, top: 0, bottom: 0 }
+        }
         onDragEnd={handleDragEnd}
         whileDrag={{ scale: 1.03 }}
         transition={{ type: "spring", stiffness: 300, damping: 22 }}

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { displayTitle } from "@/lib/data";
 import { shareCard } from "@/lib/share";
 import type { Card } from "@/lib/types";
+import { useIsStandalonePwa } from "@/hooks/useIsStandalonePwa";
 
 interface GameCardProps {
   card: Card;
@@ -28,6 +29,7 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
   const accent = card.hex;
   const [infoOpen, setInfoOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const isStandalonePwa = useIsStandalonePwa();
 
   useEffect(() => {
     if (!toast) return;
@@ -90,8 +92,9 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
           />
         ) : null}
 
-        {/* Tutorial-Hint: fest am unteren inneren Rand der farbigen Box. */}
-        {index === 0 && !infoOpen && (
+        {/* Tutorial-Hint nur im Browser – in der installierten PWA ist
+            Fullscreen schon aktiv und Swipe bekannt. */}
+        {index === 0 && !infoOpen && !isStandalonePwa && (
           <motion.div
             animate={{ y: [0, -4, 0] }}
             transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
