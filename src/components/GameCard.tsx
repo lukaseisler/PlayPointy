@@ -98,7 +98,6 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
 
   return (
     <div className="relative isolate flex h-full w-full flex-col overflow-hidden bg-white">
-      {/* Header nimmt restliche Hoehe; darf schrumpfen, Footer nicht. */}
       <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end gap-1 px-6 pt-8 pb-4">
         <span className="text-base font-semibold tracking-wide text-neutral-700 uppercase">
           Who is more likely to
@@ -109,14 +108,8 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
       </div>
 
       <div
-        className="relative z-10 aspect-[4/5] w-full min-h-0 shrink overflow-hidden transition-colors duration-500"
-        style={{
-          backgroundColor: accent,
-          // Platz fuer Header-Minimum + Footer (Buttons + Chrome-Inset) reservieren,
-          // damit die Karte die Action-Buttons nie hinter die Safari-Bar drueckt.
-          maxHeight:
-            "calc(100% - 9.5rem - env(safe-area-inset-bottom, 0px) - var(--browser-chrome-bottom, 0px))",
-        }}
+        className="relative z-10 aspect-[4/5] w-full flex-none shrink-0 overflow-hidden transition-colors duration-500"
+        style={{ backgroundColor: accent }}
       >
         <motion.button
           type="button"
@@ -259,14 +252,13 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
         </AnimatePresence>
       </div>
 
-      {/* Footer: shrink-0 – darf NIE vom Flex-Layout gequetscht werden, sonst
-          landen die Buttons hinter der Safari-URL-Leiste. Padding unten =
-          Safe-Area + Browser-Chrome-Inset (Liquid Glass Overlay). */}
+      {/* Footer: auf iOS Safari extra Padding für die floating URL-Leiste
+          (--browser-chrome-bottom), plus Safe-Area für den Home-Indicator. */}
       <div
-        className="relative z-10 flex w-full shrink-0 flex-col gap-3 px-6 pt-3"
+        className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-start gap-3 px-6 pt-3"
         style={{
           paddingBottom:
-            "calc(0.75rem + env(safe-area-inset-bottom, 0px) + var(--browser-chrome-bottom, 0px))",
+            "max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + var(--browser-chrome-bottom, 0px)))",
         }}
       >
         <span

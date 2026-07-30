@@ -1,32 +1,44 @@
 "use client";
 
 import { useEffect } from "react";
-import { isIosDevice, isStandaloneDisplayMode } from "@/lib/pwa";
+import {
+  isInAppBrowser,
+  isIosDevice,
+  isStandaloneDisplayMode,
+} from "@/lib/pwa";
 
 /**
- * iOS Safari Liquid Glass: URL-Leiste liegt als Overlay ÜBER dem Layout.
- * Setzt `--browser-chrome-bottom` (JS), ergänzend zum CSS-Fallback in globals.css.
+ * iOS Safari (Liquid Glass): die untere URL-Leiste schwebt als Overlay über
+ * dem Layout-Viewport und steckt NICHT in `safe-area-inset` / visualViewport.
+ * Nur im normalen Browser-Tab (nicht PWA/Standalone) setzen wir deshalb
+ * `--browser-chrome-bottom`, damit Footer-Buttons darüber bleiben.
  */
 export function useBrowserChromeInset(): void {
   useEffect(() => {
     const root = document.documentElement;
 
     function sync() {
-      const needsChromePad = isIosDevice() && !isStandaloneDisplayMode();
-      // Großzügig: floating Liquid-Glass-Bar + Luft (~112px).
+      const needsChromePad =
+        isIosDevice() && !isStandaloneDisplayMode() && !isInAppBrowser();
+
+      // ~72px deckt die floating Safari-Bar inkl. etwas Luft ab.
+      // Home-Indicator kommt zusätzlich über env(safe-area-inset-bottom).
       root.style.setProperty(
         "--browser-chrome-bottom",
-        needsChromePad ? "7rem" : "0px",
+        needsChromePad ? "4.5rem" : "0px",
       );
     }
 
     sync();
+
     const mq = window.matchMedia("(display-mode: standalone)");
-    mq.addEventListener("change", sync);
-    window.addEventListener("orientationchange", sync);
+    const onChange = () => sync();
+    mq.addEventListener("change", onChange);
+    window.addEventListener("orientationchange", onChange);
+
     return () => {
-      mq.removeEventListener("change", sync);
-      window.removeEventListener("orientationchange", sync);
+      mq.removeEventListener("change", onChange);
+      window.removeEventListener("orientationchange", onChange);
     };
   }, []);
 }
