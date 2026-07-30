@@ -252,9 +252,15 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
         </AnimatePresence>
       </div>
 
-      {/* Footer: folgt dem Visual-Viewport-Frame (PhoneFrame) – kein Extra-
-          Safari-Offset nötig; Safe-Area nur für Home-Indicator. */}
-      <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-start gap-3 px-6 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+      {/* Footer: auf iOS Safari extra Padding für die floating URL-Leiste
+          (--browser-chrome-bottom), plus Safe-Area für den Home-Indicator. */}
+      <div
+        className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-start gap-3 px-6 pt-3"
+        style={{
+          paddingBottom:
+            "max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + var(--browser-chrome-bottom, 0px)))",
+        }}
+      >
         <span
           className="text-center font-oswald text-lg font-bold tracking-widest uppercase transition-colors duration-500"
           style={{ color: accent }}
