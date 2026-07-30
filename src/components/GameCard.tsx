@@ -191,6 +191,13 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
                     Imprint
                   </Link>
                   <Link
+                    href="/privacy"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    className="pointer-events-auto rounded-xl bg-white/15 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-white/25"
+                  >
+                    Privacy
+                  </Link>
+                  <Link
                     href="/terms"
                     onPointerDown={(e) => e.stopPropagation()}
                     className="pointer-events-auto rounded-xl bg-white/15 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-white/25"

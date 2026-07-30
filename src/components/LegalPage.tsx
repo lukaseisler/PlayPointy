@@ -2,7 +2,7 @@ import Link from "next/link";
 import PhoneFrame from "@/components/PhoneFrame";
 
 /**
- * Schlichtes Layout fuer Legal-Platzhalter (/imprint, /terms):
+ * Schlichtes Layout fuer Legal-Seiten (/imprint, /terms, /privacy):
  * gleicher Phone-Frame wie das Spiel, zentrierter Text, Back-Link.
  */
 export default function LegalPage({
