@@ -5,6 +5,9 @@
   --foreground: #171717;
   --font-fredoka: "Fredoka", sans-serif;
   --font-oswald: "Oswald", sans-serif;
+  /* iOS Safari: durch useVisualViewportLock überschrieben */
+  --app-height: 100dvh;
+  --app-top: 0px;
 }
 
 @theme inline {

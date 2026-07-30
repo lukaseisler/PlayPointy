@@ -77,12 +77,6 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
     return () => window.clearTimeout(t);
   }, [toast]);
 
-  // Bei Kartenwechsel: verspielte Counter-Burst-Animation.
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- burst on card change
-    setBurstKey((k) => k + 1);
-  }, [card.id, position]);
-
   async function handleShare() {
     const result = await shareCard(card);
     if (result === "copied") setToast("Copied to clipboard");
@@ -104,7 +98,7 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
 
   return (
     <div className="relative isolate flex h-full w-full flex-col overflow-hidden bg-white">
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end gap-1 px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-4">
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end gap-1 px-6 pt-8 pb-4">
         <span className="text-base font-semibold tracking-wide text-neutral-700 uppercase">
           Who is more likely to
         </span>
@@ -258,8 +252,9 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
         </AnimatePresence>
       </div>
 
-      {/* Footer: Safe-Area damit Safari-Leiste Buttons nicht verdeckt. */}
-      <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-start gap-3 px-6 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+      {/* Footer: folgt dem Visual-Viewport-Frame (PhoneFrame) – kein Extra-
+          Safari-Offset nötig; Safe-Area nur für Home-Indicator. */}
+      <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-start gap-3 px-6 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
         <span
           className="text-center font-oswald text-lg font-bold tracking-widest uppercase transition-colors duration-500"
           style={{ color: accent }}
