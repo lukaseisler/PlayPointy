@@ -19,10 +19,10 @@ export function buildShareUrl(card: Card): string {
 
 /**
  * Share-Nachricht laut Product Spec:
- * "That's so you haha! 😂\n\n[Kartentext]:\n[LINK]"
+ * "That's so you haha! 😂\n\n🃏 [Kartentext]:\n[LINK]"
  */
 export function buildShareMessage(card: Card): string {
-  return `That's so you haha! 😂\n\n${cardTextWithoutQuestion(card.text)}:\n${buildShareUrl(card)}`;
+  return `That's so you haha! 😂\n\n🃏 ${cardTextWithoutQuestion(card.text)}:\n${buildShareUrl(card)}`;
 }
 
 /** OG-Vorschau: Title prominent, Domain als Description (kein Kartentext-Doppel). */
