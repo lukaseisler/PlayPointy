@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion, useAnimation, useDragControls } from "framer-motion";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import type { PackSummary } from "@/lib/types";
 import { FREE_PACK_ID } from "@/lib/data";
 
@@ -15,6 +16,19 @@ interface StoreModalProps {
   onActivePacksChange: (ids: string[]) => void;
   onClose: () => void;
   onReshuffle: () => void;
+}
+
+const STORE_CATCHPHRASES = [
+  "More packs. More drama. 🎭🔥",
+  "Unlock more packs for even more chaos. 🌪️😈",
+  "Make things weird. Unlock new packs. 👀🌶️",
+  "Level up your party. 🚀",
+  "Bonds will be tested. Get more cards. 💔😂",
+  "Boring company? Unlock more chaos. 🥱💸",
+] as const;
+
+function pickStoreCatchphrase(): string {
+  return STORE_CATCHPHRASES[Math.floor(Math.random() * STORE_CATCHPHRASES.length)]!;
 }
 
 /**
@@ -36,6 +50,14 @@ export default function StoreModal({
 }: StoreModalProps) {
   const dragControls = useDragControls();
   const wiggleControls = useAnimation();
+  const [catchphrase, setCatchphrase] = useState<string>(STORE_CATCHPHRASES[1]);
+
+  // Bei jedem Öffnen eine neue Catchphrase würfeln.
+  useEffect(() => {
+    if (!open) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fresh tagline per store open
+    setCatchphrase(pickStoreCatchphrase());
+  }, [open]);
 
   function toggleActive(id: string) {
     const isActive = activePackIds.includes(id);
@@ -50,6 +72,11 @@ export default function StoreModal({
       isActive ? activePackIds.filter((p) => p !== id) : [...activePackIds, id],
     );
   }
+
+  const subtitle =
+    reason === "limit"
+      ? "You've played all 30 free cards. Unlock more packs and keep going!"
+      : catchphrase;
 
   return (
     <AnimatePresence>
@@ -115,11 +142,7 @@ export default function StoreModal({
                     ? "Starter Chaos complete!"
                     : "All Packs"}
                 </h2>
-                <p className="mt-1 text-sm text-neutral-500">
-                  {reason === "limit"
-                    ? "You've played all 30 free cards. Unlock more packs and keep going!"
-                    : "Unlock more packs for even more chaos."}
-                </p>
+                <p className="mt-1 text-sm text-neutral-500">{subtitle}</p>
               </div>
             </div>
 
