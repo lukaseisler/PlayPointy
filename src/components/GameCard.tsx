@@ -17,18 +17,57 @@ interface GameCardProps {
   onOpenStore: () => void;
 }
 
+interface BurstParticle {
+  id: string;
+  x: number;
+  delay: number;
+  rotate: number;
+}
+
+function CardCounterBurst({ burstKey }: { burstKey: number }) {
+  const particles: BurstParticle[] = Array.from({ length: 6 }, (_, i) => ({
+    id: `${burstKey}-${i}`,
+    x: (i - 2.5) * 14,
+    delay: i * 0.04,
+    rotate: (i - 2.5) * 12,
+  }));
+
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex justify-end pr-2">
+      <AnimatePresence>
+        {particles.map((p) => (
+          <motion.span
+            key={p.id}
+            initial={{ opacity: 0, y: 8, scale: 0.4, x: 0 }}
+            animate={{
+              opacity: [0, 1, 1, 0],
+              y: [8, -12, -48, -72],
+              x: p.x,
+              scale: [0.4, 1.1, 1, 0.7],
+              rotate: p.rotate,
+            }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.75, delay: p.delay, ease: "easeOut" }}
+            className="absolute top-0 right-6 text-lg"
+            aria-hidden
+          >
+            🎴
+          </motion.span>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 /**
  * Eine einzelne Spielkarte. Färbt sich komplett passend zu `card.hex`
  * (Hintergrund der Bildfläche, Pack-Label, beide Buttons).
- *
- * Layout laut Projekt-Summary: weisser Header, farbiger Hintergrund
- * FULL WIDTH (links/rechts bündig mit dem Phone-Frame), weisser Footer.
- * Die Karte füllt den gesamten Frame – kein schwebendes "Spielkarten"-Widget.
  */
 export default function GameCard({ card, position, index, total, onOpenStore }: GameCardProps) {
   const accent = card.hex;
   const [infoOpen, setInfoOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [burstKey, setBurstKey] = useState(0);
   const isStandalonePwa = useIsStandalonePwa();
   const logoControls = useAnimation();
 
@@ -38,6 +77,12 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
     return () => window.clearTimeout(t);
   }, [toast]);
 
+  // Bei Kartenwechsel: verspielte Counter-Burst-Animation.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- burst on card change
+    setBurstKey((k) => k + 1);
+  }, [card.id, position]);
+
   async function handleShare() {
     const result = await shareCard(card);
     if (result === "copied") setToast("Copied to clipboard");
@@ -45,7 +90,6 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
 
   async function handleLogoBoop(e: React.MouseEvent<HTMLButtonElement>) {
     e.stopPropagation();
-    // Rein visuell: kurze Bounce/Scale-Sequenz, kein Gameplay-Side-Effect.
     await logoControls.start({
       scale: [1, 1.22, 0.88, 1.1, 1],
       rotate: [0, -8, 6, -3, 0],
@@ -53,15 +97,14 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
     });
   }
 
+  function handleCounterTap(e: React.MouseEvent) {
+    e.stopPropagation();
+    setBurstKey((k) => k + 1);
+  }
+
   return (
-    // `h-full w-full`: füllt den Phone-Frame komplett. Header und Footer
-    // sind `flex-1` und nehmen Extra-Hoehe (z.B. nach Fullscreen) auf –
-    // die farbige Bildflaeche darunter bleibt in der Groesse stabil.
     <div className="relative isolate flex h-full w-full flex-col overflow-hidden bg-white">
-      {/* Weißer Header: waechst mit `flex-1`, Inhalt dockt unten an die
-          farbige Box (`justify-end`) – so wirkt Extra-Platz entspannt oben,
-          ohne Text/Buttons zu vergroessern. */}
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end gap-1 px-6 pt-8 pb-4">
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end gap-1 px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-4">
         <span className="text-base font-semibold tracking-wide text-neutral-700 uppercase">
           Who is more likely to
         </span>
@@ -70,18 +113,14 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
         </h1>
       </div>
 
-      {/* Farbige Bildfläche – FULL WIDTH, Hoehe fest an die Breite gekoppelt
-          (`aspect-[4/5]` = 800×1000px-Canvas). KEIN `flex-1`: sonst wuerde
-          Fullscreen die Box strecken und das WebP verzerren. `flex-none
-          shrink-0` haelt die Masse konstant. */}
       <div
         className="relative z-10 aspect-[4/5] w-full flex-none shrink-0 overflow-hidden transition-colors duration-500"
         style={{ backgroundColor: accent }}
       >
-        {/* Logo-Easter-Egg: Tap → Boop (Bounce/Scale), ohne Spielablauf. */}
         <motion.button
           type="button"
           aria-label="PlayPointy"
+          data-no-tap-nav
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
             void handleLogoBoop(e);
@@ -100,9 +139,20 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
             className="pointer-events-none h-auto w-[94px] select-none"
           />
         </motion.button>
-        <span className="pointer-events-none absolute top-4 right-4 z-10 text-[22px] font-medium tracking-wide text-white">
-          {position} / {total}
-        </span>
+
+        <div className="absolute top-4 right-4 z-10">
+          <button
+            type="button"
+            data-no-tap-nav
+            aria-label={`${position} of ${total} cards`}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={handleCounterTap}
+            className="pointer-events-auto relative cursor-pointer border-0 bg-transparent p-0 text-[22px] font-medium tracking-wide text-white"
+          >
+            {position} / {total}
+          </button>
+          {burstKey > 0 && <CardCounterBurst key={burstKey} burstKey={burstKey} />}
+        </div>
 
         {card.image ? (
           <Image
@@ -116,9 +166,6 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
           />
         ) : null}
 
-        {/* Tutorial-Hint nur im Browser (nicht in der installierten PWA).
-            Fullscreen-Hinweis entfaellt: iOS Safari unterstuetzt die
-            Fullscreen-API nicht, der Text waere dort nutzlos. */}
         {index === 0 && !infoOpen && !isStandalonePwa && (
           <motion.div
             animate={{ y: [0, -4, 0] }}
@@ -129,10 +176,9 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
           </motion.div>
         )}
 
-        {/* Aufrechtes (i)-Icon unten links in der farbigen Box.
-            Wasserzeichen bleibt separat unten rechts. */}
         <button
           type="button"
+          data-no-tap-nav
           aria-label="Legal information"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
@@ -143,14 +189,15 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
         >
           i
         </button>
+        {/* Rein dekorativ – Klicks fallen durch aufs rechte Drittel (nächste Karte). */}
         <span
-          className="pointer-events-none absolute right-1.5 bottom-3 z-30 origin-bottom-right text-[22px] font-medium tracking-wide text-white"
+          className="pointer-events-none absolute right-1.5 bottom-3 z-30 origin-bottom-right text-[14px] font-medium tracking-wide text-white/90"
           style={{ writingMode: "vertical-rl" }}
+          aria-hidden
         >
           playpointy.com
         </span>
 
-        {/* Minimales Legal-Overlay IN der farbigen Box (Glas-Effekt). */}
         <AnimatePresence>
           {infoOpen && (
             <motion.div
@@ -211,9 +258,8 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
         </AnimatePresence>
       </div>
 
-      {/* Weißer Footer: spiegelt den Header – `flex-1` + `justify-start`,
-          Inhalt bleibt an der farbigen Box, Extra-Platz geht nach unten. */}
-      <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-start gap-3 px-6 pt-3 pb-6">
+      {/* Footer: Safe-Area damit Safari-Leiste Buttons nicht verdeckt. */}
+      <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-start gap-3 px-6 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <span
           className="text-center font-oswald text-lg font-bold tracking-widest uppercase transition-colors duration-500"
           style={{ color: accent }}
@@ -223,6 +269,7 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
         <div className="flex w-full gap-3">
           <button
             type="button"
+            data-no-tap-nav
             onPointerDown={(e) => e.stopPropagation()}
             onClick={onOpenStore}
             className="pointer-events-auto relative z-50 min-w-0 flex-1 cursor-pointer rounded-full py-3 text-center text-lg font-semibold text-white shadow-sm transition-colors duration-500"
@@ -232,6 +279,7 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
           </button>
           <button
             type="button"
+            data-no-tap-nav
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => {
               void handleShare();

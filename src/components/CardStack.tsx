@@ -1,7 +1,7 @@
 "use client";
 
 import { animate, motion, useMotionValue, useTransform, type PanInfo } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useIsStandalonePwa } from "@/hooks/useIsStandalonePwa";
 import type { Card } from "@/lib/types";
 
@@ -16,28 +16,18 @@ interface CardStackProps {
 const SWIPE_DISTANCE_THRESHOLD = 110;
 const SWIPE_VELOCITY_THRESHOLD = 500;
 const FLY_OUT_DISTANCE = 600;
+/** Max. Bewegung, damit ein Pointer-Up noch als Tap (nicht Drag) gilt. */
+const TAP_MOVE_THRESHOLD = 12;
 
 /**
  * Zeigt die aktuelle Karte (per Drag/Swipe steuerbar) plus die Karte, die
- * beim Wegziehen sichtbar wird - exakt deckungsgleich dahinter (kein
- * inset/scale/rotate-Versatz, kein sichtbarer Rahmen/Spalt/Seam).
+ * beim Wegziehen sichtbar wird - exakt deckungsgleich dahinter.
  *
- * WICHTIG: Welche Karte dahinter auftaucht, haengt von der Zugrichtung ab:
- * - Zieht man nach LINKS (x < 0)  -> dahinter erscheint die NAECHSTE Karte
- *   (Swipe links = "naechste Karte").
- * - Zieht man nach RECHTS (x > 0) -> dahinter erscheint die VORHERIGE Karte
- *   (Swipe rechts = "Undo/zurueck"). Vorher wurde hier immer nur `index + 1`
- *   gezeigt, wodurch beim Rechts-Swipe zunaechst die falsche (naechste) Karte
- *   sichtbar war und erst nach Abschluss der Animation auf die vorherige
- *   "umgesprungen" ist. Beide Karten liegen jetzt permanent uebereinander im
- *   DOM und ihre Opacity ist direkt an das Vorzeichen von `x` gekoppelt -
- *   dadurch ist von der allerersten Pixel-Bewegung an die richtige Karte
- *   sichtbar, ganz ohne Sprung am Ende.
+ * Zusätzlich: Tap linkes Drittel → zurück, Tap rechtes Drittel → weiter
+ * (Mittelbereich bleibt frei für Lesen/Buttons).
  *
- * Swipe links  -> onSwipeLeft()  (nächste Karte)
- * Swipe rechts -> onSwipeRight() (vorherige Karte)
- * dragMomentum ist deaktiviert, damit unsere eigene Spring-/Fly-Out-Animation
- * in onDragEnd nicht mit Framer Motions Trägheits-Animation konkurriert.
+ * Mehrfinger-Touches deaktivieren den Drag kurzzeitig, damit iOS Safari die
+ * native Pinch-Geste in die Tab-Übersicht behält.
  */
 export default function CardStack({
   cards,
@@ -48,32 +38,30 @@ export default function CardStack({
 }: CardStackProps) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-320, 0, 320], [-12, 0, 12]);
-  // Sichtbarkeit der beiden "dahinter"-Karten - Stufenfunktion statt Fade,
-  // damit exakt beim Vorzeichenwechsel von `x` (Zugrichtung) instantan auf
-  // die jeweils passende Karte umgeschaltet wird.
   const showNext = useTransform(x, (v) => (v > 0 ? 0 : 1));
   const showPrev = useTransform(x, (v) => (v > 0 ? 1 : 0));
   const isFlying = useRef(false);
+  const didDrag = useRef(false);
+  const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const isStandalonePwa = useIsStandalonePwa();
+  const [dragEnabled, setDragEnabled] = useState(true);
 
   const current = cards[index];
   const next = cards[index + 1];
-  // Sonderfall erste Karte (index === 0): Es gibt noch keine "vorherige"
-  // Karte - ein Rechts-Swipe auf Karte 1 verhaelt sich bewusst identisch
-  // zu Links, zeigt also ebenfalls schon die NAECHSTE Karte dahinter,
-  // statt wrap-around auf die letzte Karte des Stapels zu springen.
   const prevIndex = index > 0 ? index - 1 : index + 1;
   const prev = cards[prevIndex];
 
+  function handleDragStart() {
+    didDrag.current = true;
+  }
+
   function handleDragEnd(_event: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) {
-    // Swipe hoch/runter steuert den nativen Vollbildmodus - nicht in der
-    // installierten PWA (dort laeuft die App bereits ohne Browser-Chrome).
     if (!isStandalonePwa && info.offset.y < -100) {
       setTimeout(() => {
         try {
           document.documentElement.requestFullscreen().catch(() => {});
         } catch {
-          // Ignore Safari specific errors
+          /* ignore */
         }
       }, 450);
       return;
@@ -83,7 +71,7 @@ export default function CardStack({
         try {
           document.exitFullscreen().catch(() => {});
         } catch {
-          // Ignore Safari specific errors
+          /* ignore */
         }
       }, 450);
       return;
@@ -123,14 +111,67 @@ export default function CardStack({
     });
   }
 
+  function handlePointerDown(e: React.PointerEvent) {
+    pointerStart.current = { x: e.clientX, y: e.clientY };
+    didDrag.current = false;
+  }
+
+  function handlePointerUp(e: React.PointerEvent) {
+    if (isFlying.current || didDrag.current || !dragEnabled) {
+      pointerStart.current = null;
+      return;
+    }
+    const start = pointerStart.current;
+    pointerStart.current = null;
+    if (!start) return;
+
+    const dx = Math.abs(e.clientX - start.x);
+    const dy = Math.abs(e.clientY - start.y);
+    if (dx > TAP_MOVE_THRESHOLD || dy > TAP_MOVE_THRESHOLD) return;
+
+    const target = e.target as HTMLElement | null;
+    // Interaktive Controls (Buttons, Links) haben Vorrang vor Tap-Navigation.
+    if (target?.closest("button, a, input, textarea, [data-no-tap-nav]")) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    const relX = (e.clientX - rect.left) / rect.width;
+
+    if (relX < 1 / 3) {
+      // Linkes Drittel → vorherige Karte (wie Swipe rechts)
+      flyOut(1, onSwipeRight);
+    } else if (relX > 2 / 3) {
+      // Rechtes Drittel → nächste Karte (wie Swipe links)
+      flyOut(-1, onSwipeLeft);
+    }
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    // Mehrfinger = native Browser-Geste (z. B. iOS Tab-Übersicht) → Drag aus.
+    if (e.touches.length > 1) {
+      setDragEnabled(false);
+      didDrag.current = true;
+      animate(x, 0, { type: "spring", stiffness: 400, damping: 35 });
+    }
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (e.touches.length === 0) {
+      setDragEnabled(true);
+    }
+  }
+
   if (!current) return null;
 
+  const dragProp = !dragEnabled ? false : isStandalonePwa ? "x" : true;
+
   return (
-    // `isolate` erzeugt einen eigenen Stacking-Context, damit die z-index
-    // Werte der Karten sich nicht mit Modals/anderen Teilen der Seite mischen.
-    // `touch-none` verhindert, dass der Browser hier eigene Scroll-/Zoom-
-    // Gesten gegen Framer Motions Drag-Erkennung "gewinnt".
-    <div className="relative isolate min-h-0 flex-1 touch-none overflow-hidden">
+    <div
+      className="relative isolate min-h-0 flex-1 overflow-hidden"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+    >
       {next && (
         <motion.div
           key={`next-${next.id}`}
@@ -152,24 +193,16 @@ export default function CardStack({
         </motion.div>
       )}
 
-      {/* GameCard fuellt den Frame randlos (`h-full w-full`) – daher kein
-          `items-center justify-center` mehr (das gehoerte zum kurzlebigen
-          "schwebende Spielkarte"-Experiment). */}
       <motion.div
         key={current.id}
-        className="pointer-events-auto absolute inset-0 z-10 cursor-grab touch-none border-none outline-none [backface-visibility:hidden] active:cursor-grabbing"
-        style={{ x, rotate }}
-        // Beide Achsen aktiv (statt nur "x"), damit ein Swipe hoch/runter
-        // (Fullscreen an/aus, siehe `handleDragEnd`) ueberhaupt als Drag-
-        // Geste erkannt wird - mit `drag="x"` allein wuerde Framer Motion
-        // eine vorwiegend vertikale Bewegung gar nicht erst als Drag werten.
-        // `dragDirectionLock` committet weiterhin fruehzeitig auf genau EINE
-        // Achse, wodurch sich Links/Rechts nach wie vor exakt wie zuvor
-        // anfuehlen - nur eben mit Vertikal als echter Alternative statt
-        // totem Winkel. `dragConstraints`/`dragElastic` fuer top/bottom
-        // sorgen dafuer, dass die Karte nach dem Loslassen (in JEDEM Fall)
-        // elastisch in die Mitte zurueckschnappt statt zu "kleben".
-        drag={isStandalonePwa ? "x" : true}
+        className="pointer-events-auto absolute inset-0 z-10 cursor-grab border-none outline-none [backface-visibility:hidden] active:cursor-grabbing"
+        style={{
+          x,
+          rotate,
+          // pinch-zoom erlaubt die iOS-Tab-Übersicht; pan-x für Karten-Swipe.
+          touchAction: isStandalonePwa ? "pan-x pinch-zoom" : "manipulation",
+        }}
+        drag={dragProp}
         dragDirectionLock={true}
         dragElastic={
           isStandalonePwa
@@ -182,7 +215,10 @@ export default function CardStack({
             ? { left: 0, right: 0 }
             : { left: 0, right: 0, top: 0, bottom: 0 }
         }
+        onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
         whileDrag={{ scale: 1.03 }}
         transition={{ type: "spring", stiffness: 300, damping: 22 }}
       >

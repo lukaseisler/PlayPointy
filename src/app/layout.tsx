@@ -41,8 +41,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  // Kein maximumScale/userScalable:false – sonst blockiert iOS Safari die
+  // native Pinch-Geste in die Tab-Übersicht.
+  viewportFit: "cover",
   themeColor: "#171717",
 };
 
