@@ -5,8 +5,19 @@
   --foreground: #171717;
   --font-fredoka: "Fredoka", sans-serif;
   --font-oswald: "Oswald", sans-serif;
-  /* iOS Safari Liquid Glass: per useBrowserChromeInset gesetzt */
   --browser-chrome-bottom: 0px;
+}
+
+/*
+ * CSS-Fallback OHNE JS: iOS WebKit im Browser-Tab (nicht PWA).
+ * Liquid Glass URL-Bar überdeckt den unteren Viewport-Rand.
+ */
+@supports (-webkit-touch-callout: none) {
+  @media not all and (display-mode: standalone) {
+    :root {
+      --browser-chrome-bottom: 7rem;
+    }
+  }
 }
 
 @theme inline {
