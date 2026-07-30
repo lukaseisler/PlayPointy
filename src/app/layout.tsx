@@ -41,6 +41,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  // Zwingend für iOS Safe-Area-Variablen (env(safe-area-inset-*)).
   // Kein maximumScale/userScalable:false – sonst blockiert iOS Safari die
   // native Pinch-Geste in die Tab-Übersicht.
   viewportFit: "cover",

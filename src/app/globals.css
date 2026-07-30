@@ -5,8 +5,6 @@
   --foreground: #171717;
   --font-fredoka: "Fredoka", sans-serif;
   --font-oswald: "Oswald", sans-serif;
-  /* iOS Safari Liquid Glass: per useBrowserChromeInset gesetzt */
-  --browser-chrome-bottom: 0px;
 }
 
 @theme inline {
