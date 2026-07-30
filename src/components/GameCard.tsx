@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useAnimation } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -30,6 +30,7 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
   const [infoOpen, setInfoOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const isStandalonePwa = useIsStandalonePwa();
+  const logoControls = useAnimation();
 
   useEffect(() => {
     if (!toast) return;
@@ -40,6 +41,16 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
   async function handleShare() {
     const result = await shareCard(card);
     if (result === "copied") setToast("Copied to clipboard");
+  }
+
+  async function handleLogoBoop(e: React.MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation();
+    // Rein visuell: kurze Bounce/Scale-Sequenz, kein Gameplay-Side-Effect.
+    await logoControls.start({
+      scale: [1, 1.22, 0.88, 1.1, 1],
+      rotate: [0, -8, 6, -3, 0],
+      transition: { duration: 0.42, ease: "easeOut" },
+    });
   }
 
   return (
@@ -67,15 +78,28 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
         className="relative z-10 aspect-[4/5] w-full flex-none shrink-0 overflow-hidden transition-colors duration-500"
         style={{ backgroundColor: accent }}
       >
-        {/* Logo ~10% kleiner als zuvor (104px → 94px). */}
-        <Image
-          src="/logo.png"
-          alt="PlayPointy"
-          width={825}
-          height={676}
-          priority
-          className="pointer-events-none absolute top-4 left-4 z-10 h-auto w-[94px] [filter:drop-shadow(0_1px_3px_rgba(0,0,0,0.35))]"
-        />
+        {/* Logo-Easter-Egg: Tap → Boop (Bounce/Scale), ohne Spielablauf. */}
+        <motion.button
+          type="button"
+          aria-label="PlayPointy"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            void handleLogoBoop(e);
+          }}
+          animate={logoControls}
+          whileTap={{ scale: 0.9 }}
+          className="pointer-events-auto absolute top-4 left-4 z-10 origin-center cursor-pointer border-0 bg-transparent p-0 [filter:drop-shadow(0_1px_3px_rgba(0,0,0,0.35))]"
+        >
+          <Image
+            src="/logo.png"
+            alt=""
+            width={825}
+            height={676}
+            priority
+            draggable={false}
+            className="pointer-events-none h-auto w-[94px] select-none"
+          />
+        </motion.button>
         <span className="pointer-events-none absolute top-4 right-4 z-10 text-[22px] font-medium tracking-wide text-white">
           {position} / {total}
         </span>

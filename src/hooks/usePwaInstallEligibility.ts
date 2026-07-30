@@ -5,6 +5,7 @@ import {
   isBraveBrowser,
   isInAppBrowser,
   isIosSafari,
+  isMobileDevice,
   isStandaloneDisplayMode,
   type BeforeInstallPromptEvent,
   type PwaInstallKind,
@@ -21,9 +22,8 @@ export interface PwaInstallEligibility {
 /**
  * Bestimmt, ob der PWA-Install-Hinweis gezeigt werden darf.
  *
- * - Standalone / IAB / Brave → stumm
- * - Chromium: erst nach `beforeinstallprompt` (Browser bestätigt Installierbarkeit)
- * - iOS Safari: A2HS über Share-Sheet
+ * - Desktop / Standalone / IAB / Brave → stumm
+ * - Nur Mobile + (Chromium BIP | iOS Safari)
  */
 export function usePwaInstallEligibility(): PwaInstallEligibility {
   const [kind, setKind] = useState<PwaInstallKind>("none");
@@ -32,7 +32,12 @@ export function usePwaInstallEligibility(): PwaInstallEligibility {
   );
 
   useEffect(() => {
-    if (isStandaloneDisplayMode() || isInAppBrowser() || isBraveBrowser()) {
+    if (
+      isStandaloneDisplayMode() ||
+      !isMobileDevice() ||
+      isInAppBrowser() ||
+      isBraveBrowser()
+    ) {
       setKind("none");
       return;
     }
@@ -43,8 +48,7 @@ export function usePwaInstallEligibility(): PwaInstallEligibility {
     }
 
     function onBeforeInstallPrompt(event: Event) {
-      // Doppelcheck: IAB/Brave feuern BIP praktisch nie, aber falls doch → ignorieren
-      if (isInAppBrowser() || isBraveBrowser()) return;
+      if (!isMobileDevice() || isInAppBrowser() || isBraveBrowser()) return;
       event.preventDefault();
       const bip = event as BeforeInstallPromptEvent;
       setDeferredPrompt(bip);

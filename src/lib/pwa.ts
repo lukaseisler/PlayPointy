@@ -92,12 +92,29 @@ export function isIosSafari(): boolean {
 }
 
 /**
+ * Mobiles Endgerät (Phone/Tablet) – Desktop-Browser bewusst ausgeschlossen,
+ * damit der PWA-Install-Hinweis nur auf dem Party-Handy erscheint.
+ */
+export function isMobileDevice(): boolean {
+  if (typeof window === "undefined" || typeof navigator === "undefined") return false;
+  if (isIosDevice()) return true;
+  if (/Android.+Mobile|Android.+Tablet|webOS|BlackBerry|IEMobile|Opera Mini/i.test(getUa())) {
+    return true;
+  }
+  // Generisches Mobile-Token (Android Chrome Mobile etc.)
+  if (/Mobi/i.test(getUa())) return true;
+  // Touch-first Phones/Tablets ohne Desktop-Hover
+  return window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+}
+
+/**
  * Sync-Snapshot ohne BIP-Event: nie "chromium" (braucht Event).
  * Wird vom Hook mit BIP-State kombiniert.
  */
 export function getStaticInstallKind(): PwaInstallKind {
   if (typeof window === "undefined") return "none";
   if (isStandaloneDisplayMode()) return "none";
+  if (!isMobileDevice()) return "none";
   if (isInAppBrowser()) return "none";
   if (isBraveBrowser()) return "none";
   if (isIosSafari()) return "ios-safari";
