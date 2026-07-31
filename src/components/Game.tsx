@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import CardStack from "./CardStack";
 import GameCard from "./GameCard";
 import PWANudge from "./PWANudge";
@@ -46,11 +46,17 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
   const isStandalonePwa = useIsStandalonePwa();
   const { canPrompt, kind: installKind } = usePwaInstallEligibility();
 
-  // Nach Mount: aktive Packs aus localStorage → Deck neu bauen (Gäste = Starter,
-  // Wiederkehrer = gespeicherte Packs). Featured bleibt Index 0.
-  useEffect(() => {
+  // Aktive Packs aus localStorage. useLayoutEffect: vor dem Paint, damit kein
+  // sichtbarer Karten-Flash entsteht. Gäste mit nur Starter behalten das
+  // SSR-Deck (kein zweites Shuffle) — siehe page.tsx Kommentar.
+  useLayoutEffect(() => {
     const packIds = readActivePackIds();
     setActivePackIds(packIds);
+
+    const keepServerDeck =
+      !featuredCard && packIds.length === 1 && packIds[0] === FREE_PACK_ID;
+    if (keepServerDeck) return;
+
     // eslint-disable-next-line react-hooks/set-state-in-effect -- client deck from localStorage after SSR seed
     setCards(buildDeck(packIds, featuredCard));
     setIndex(0);

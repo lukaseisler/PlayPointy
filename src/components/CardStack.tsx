@@ -33,8 +33,9 @@ export default function CardStack({
 }: CardStackProps) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-320, 0, 320], [-12, 0, 12]);
-  const showNext = useTransform(x, (v) => (v > 0 ? 0 : 1));
-  const showPrev = useTransform(x, (v) => (v > 0 ? 1 : 0));
+  // Bei Ruhe (x=0) Opacity 0 — sonst blitzt die Next-Karte beim Remount durch.
+  const showNext = useTransform(x, [-120, 0], [1, 0], { clamp: true });
+  const showPrev = useTransform(x, [0, 120], [0, 1], { clamp: true });
   const isFlying = useRef(false);
   const didDrag = useRef(false);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
