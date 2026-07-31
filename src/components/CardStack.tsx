@@ -17,19 +17,12 @@ const SWIPE_VELOCITY_THRESHOLD = 450;
 const FLY_OUT_DISTANCE = 600;
 const TAP_MOVE_THRESHOLD = 12;
 
-interface ExitingCard {
-  card: Card;
-  index: number;
-  direction: -1 | 1;
-  startX: number;
-}
-
 /**
  * Kartenstapel mit horizontalem Drag-Swipe + Tap linkes/rechtes Drittel.
  *
- * Swipe-Commit ist sofort: Index wechselt beim Loslassen, die alte Karte
- * fliegt nur noch als `pointer-events-none`-Ghost weg. So bleiben Store-
- * Buttons auf der neuen Karte ohne Wartezeit tappbar (Conversion).
+ * Wichtig für Mobile: immer `drag="x"` (nie beide Achsen + directionLock).
+ * Sonst lockt der erste vertikale Finger-Pixel die Geste auf Y und horizontales
+ * Swipen scheitert — Desktop-Maus bleibt präzise genug und wirkt „ok“.
  */
 export default function CardStack({
   cards,
@@ -42,10 +35,10 @@ export default function CardStack({
   const rotate = useTransform(x, [-320, 0, 320], [-12, 0, 12]);
   const showNext = useTransform(x, (v) => (v > 0 ? 0 : 1));
   const showPrev = useTransform(x, (v) => (v > 0 ? 1 : 0));
+  const isFlying = useRef(false);
   const didDrag = useRef(false);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const [dragEnabled, setDragEnabled] = useState(true);
-  const [exiting, setExiting] = useState<ExitingCard | null>(null);
 
   const current = cards[index];
   const next = cards[index + 1];
@@ -57,6 +50,8 @@ export default function CardStack({
   }
 
   function handleDragEnd(_event: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) {
+    if (isFlying.current) return;
+
     const offsetX = info.offset.x;
     const velocityX = info.velocity.x;
     const shouldSwipe =
@@ -66,9 +61,9 @@ export default function CardStack({
     if (shouldSwipe) {
       const direction = offsetX !== 0 ? Math.sign(offsetX) : Math.sign(velocityX);
       if (direction < 0) {
-        commitSwipe(-1, onSwipeLeft);
+        flyOut(-1, onSwipeLeft);
       } else {
-        commitSwipe(1, onSwipeRight);
+        flyOut(1, onSwipeRight);
       }
       return;
     }
@@ -76,13 +71,18 @@ export default function CardStack({
     animate(x, 0, { type: "spring", stiffness: 380, damping: 32 });
   }
 
-  /** Navigation sofort committen; Exit nur noch als visueller Ghost. */
-  function commitSwipe(direction: -1 | 1, callback: () => void) {
-    setExiting({ card: current, index, direction, startX: x.get() });
-    callback();
-    x.set(0);
-    didDrag.current = false;
-    pointerStart.current = null;
+  function flyOut(direction: -1 | 1, callback: () => void) {
+    isFlying.current = true;
+    animate(x, direction * FLY_OUT_DISTANCE, {
+      type: "tween",
+      duration: 0.28,
+      ease: [0.32, 0.72, 0.35, 1],
+      onComplete: () => {
+        callback();
+        x.set(0);
+        isFlying.current = false;
+      },
+    });
   }
 
   function handlePointerDown(e: React.PointerEvent) {
@@ -91,7 +91,7 @@ export default function CardStack({
   }
 
   function handlePointerUp(e: React.PointerEvent) {
-    if (didDrag.current || !dragEnabled) {
+    if (isFlying.current || didDrag.current || !dragEnabled) {
       pointerStart.current = null;
       return;
     }
@@ -111,13 +111,14 @@ export default function CardStack({
     const relX = (e.clientX - rect.left) / rect.width;
 
     if (relX < 1 / 3) {
-      commitSwipe(1, onSwipeRight);
+      flyOut(1, onSwipeRight);
     } else if (relX > 2 / 3) {
-      commitSwipe(-1, onSwipeLeft);
+      flyOut(-1, onSwipeLeft);
     }
   }
 
   function handleTouchStart(e: React.TouchEvent) {
+    // Mehrfinger = native Browser-Geste (z. B. iOS Tab-Übersicht) → Drag aus.
     if (e.touches.length > 1) {
       setDragEnabled(false);
       didDrag.current = true;
@@ -178,33 +179,6 @@ export default function CardStack({
       >
         {renderCard(current, index)}
       </motion.div>
-
-      {/* Visueller Exit über der neuen Karte — Klicks fallen durch auf Buttons. */}
-      {exiting && (
-        <motion.div
-          key={`exit-${exiting.card.id}-${exiting.direction}`}
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-20 border-none outline-none [backface-visibility:hidden]"
-          initial={{
-            x: exiting.startX,
-            rotate: (exiting.startX / 320) * 12,
-            scale: 1.03,
-          }}
-          animate={{
-            x: exiting.direction * FLY_OUT_DISTANCE,
-            rotate: exiting.direction * 12,
-            scale: 1,
-          }}
-          transition={{ duration: 0.28, ease: [0.32, 0.72, 0.35, 1] }}
-          onAnimationComplete={() => {
-            setExiting((currentExit) =>
-              currentExit?.card.id === exiting.card.id ? null : currentExit,
-            );
-          }}
-        >
-          {renderCard(exiting.card, exiting.index)}
-        </motion.div>
-      )}
     </div>
   );
 }
