@@ -2,7 +2,6 @@
 
 import { animate, motion, useMotionValue, useTransform, type PanInfo } from "framer-motion";
 import { useRef, useState } from "react";
-import { useIsStandalonePwa } from "@/hooks/useIsStandalonePwa";
 import type { Card } from "@/lib/types";
 
 interface CardStackProps {
@@ -13,15 +12,17 @@ interface CardStackProps {
   renderCard: (card: Card, index: number) => React.ReactNode;
 }
 
-const SWIPE_DISTANCE_THRESHOLD = 110;
-const SWIPE_VELOCITY_THRESHOLD = 500;
+const SWIPE_DISTANCE_THRESHOLD = 90;
+const SWIPE_VELOCITY_THRESHOLD = 450;
 const FLY_OUT_DISTANCE = 600;
 const TAP_MOVE_THRESHOLD = 12;
 
 /**
- * Kartenstapel mit Drag-Swipe + Tap linkes/rechtes Drittel.
- * `touch-action: none` auf der aktiven Karte ist nötig, damit Framer Motion
- * horizontale Swipes zuverlässig bekommt (nicht der Browser).
+ * Kartenstapel mit horizontalem Drag-Swipe + Tap linkes/rechtes Drittel.
+ *
+ * Wichtig für Mobile: immer `drag="x"` (nie beide Achsen + directionLock).
+ * Sonst lockt der erste vertikale Finger-Pixel die Geste auf Y und horizontales
+ * Swipen scheitert — Desktop-Maus bleibt präzise genug und wirkt „ok“.
  */
 export default function CardStack({
   cards,
@@ -37,7 +38,6 @@ export default function CardStack({
   const isFlying = useRef(false);
   const didDrag = useRef(false);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
-  const isStandalonePwa = useIsStandalonePwa();
   const [dragEnabled, setDragEnabled] = useState(true);
 
   const current = cards[index];
@@ -50,27 +50,6 @@ export default function CardStack({
   }
 
   function handleDragEnd(_event: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) {
-    if (!isStandalonePwa && info.offset.y < -100) {
-      setTimeout(() => {
-        try {
-          document.documentElement.requestFullscreen().catch(() => {});
-        } catch {
-          /* ignore */
-        }
-      }, 450);
-      return;
-    }
-    if (!isStandalonePwa && info.offset.y > 100) {
-      setTimeout(() => {
-        try {
-          document.exitFullscreen().catch(() => {});
-        } catch {
-          /* ignore */
-        }
-      }, 450);
-      return;
-    }
-
     if (isFlying.current) return;
 
     const offsetX = info.offset.x;
@@ -139,6 +118,7 @@ export default function CardStack({
   }
 
   function handleTouchStart(e: React.TouchEvent) {
+    // Mehrfinger = native Browser-Geste (z. B. iOS Tab-Übersicht) → Drag aus.
     if (e.touches.length > 1) {
       setDragEnabled(false);
       didDrag.current = true;
@@ -154,11 +134,9 @@ export default function CardStack({
 
   if (!current) return null;
 
-  const dragProp = !dragEnabled ? false : isStandalonePwa ? ("x" as const) : true;
-
   return (
     <div
-      className="relative isolate min-h-0 flex-1 touch-none overflow-hidden"
+      className="relative isolate min-h-0 flex-1 overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
@@ -186,21 +164,12 @@ export default function CardStack({
 
       <motion.div
         key={current.id}
-        className="pointer-events-auto absolute inset-0 z-10 cursor-grab touch-none border-none outline-none [backface-visibility:hidden] active:cursor-grabbing"
+        className="pointer-events-auto absolute inset-0 z-10 cursor-grab border-none outline-none [backface-visibility:hidden] active:cursor-grabbing"
         style={{ x, rotate, touchAction: "none" }}
-        drag={dragProp}
-        dragDirectionLock={true}
-        dragElastic={
-          isStandalonePwa
-            ? 0.6
-            : { left: 0.6, right: 0.6, top: 0.4, bottom: 0.4 }
-        }
+        drag={dragEnabled ? "x" : false}
+        dragElastic={0.6}
         dragMomentum={false}
-        dragConstraints={
-          isStandalonePwa
-            ? { left: 0, right: 0 }
-            : { left: 0, right: 0, top: 0, bottom: 0 }
-        }
+        dragConstraints={{ left: 0, right: 0 }}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onPointerDown={handlePointerDown}

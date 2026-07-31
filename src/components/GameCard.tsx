@@ -67,8 +67,12 @@ export default function GameCard({
   }
 
   return (
-    <div className="relative isolate flex h-full w-full flex-col overflow-x-hidden overflow-y-visible bg-white">
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end gap-1 px-6 pt-8 pb-4">
+    <div className="relative isolate flex h-full w-full flex-col overflow-hidden bg-white">
+      {/* Equal spacers: auf hohen Displays (18:9+) zentriert, auf kurzen kollabiert. */}
+      <div className="min-h-0 flex-1 basis-0" aria-hidden />
+
+      <div className="relative z-10 flex w-full shrink-0 flex-col">
+      <div className="flex flex-col gap-1 px-6 pt-6 pb-4">
         <span className="text-base font-semibold tracking-wide text-neutral-700 uppercase">
           Who is more likely to
         </span>
@@ -78,7 +82,7 @@ export default function GameCard({
       </div>
 
       <div
-        className="relative z-10 aspect-[4/5] w-full flex-none shrink-0 overflow-visible transition-colors duration-500"
+        className="relative aspect-[4/5] w-full flex-none shrink-0 overflow-visible transition-colors duration-500"
         style={{ backgroundColor: accent }}
       >
         {/* Bild separat clippen, damit Logo-Fountain über den Rand fliegen darf. */}
@@ -115,7 +119,7 @@ export default function GameCard({
             height={676}
             priority
             draggable={false}
-            className="pointer-events-none h-auto w-[94px] select-none"
+            className="pointer-events-none h-auto w-[89px] select-none"
           />
         </motion.button>
 
@@ -224,9 +228,9 @@ export default function GameCard({
         </AnimatePresence>
       </div>
 
-      {/* Footer: am Flex-Ende, Safe-Area für Home-Indicator.
+      {/* Footer: Safe-Area für Home-Indicator.
           Chrome-Clearance kommt vom inset-0 Frame (iOS clippt über der Leiste). */}
-      <div className="relative z-10 mt-auto flex w-full shrink-0 flex-col gap-3 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="flex w-full flex-col gap-3 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <span
           className="text-center font-oswald text-lg font-bold tracking-widest uppercase transition-colors duration-500"
           style={{ color: accent }}
@@ -258,6 +262,9 @@ export default function GameCard({
           </button>
         </div>
       </div>
+      </div>
+
+      <div className="min-h-0 flex-1 basis-0" aria-hidden />
 
       <AnimatePresence>
         {toast && (
