@@ -77,7 +77,7 @@ export default function GameCard({
         <span className="text-base font-semibold tracking-wide text-neutral-700 uppercase">
           Who is more likely to
         </span>
-        <h1 className="min-h-[2lh] text-[26px] leading-tight font-semibold text-neutral-900">
+        <h1 className="flex min-h-[2lh] flex-col justify-end text-[26px] leading-tight font-semibold text-neutral-900">
           {displayTitle(card.text)}
         </h1>
       </div>
