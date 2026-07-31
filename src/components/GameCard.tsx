@@ -242,9 +242,13 @@ export default function GameCard({
           <button
             type="button"
             data-no-tap-nav
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={onOpenStore}
-            className="pointer-events-auto relative z-50 flex h-full min-w-0 flex-1 cursor-pointer items-center justify-center rounded-full text-center text-lg font-semibold text-white shadow-sm transition-colors duration-500"
+            // Capture + Aktion auf pointerdown: wie Counter — `onClick` wird nach
+            // Framer-Drag oft unterdrückt / verzögert.
+            onPointerDownCapture={(e) => {
+              e.stopPropagation();
+              onOpenStore();
+            }}
+            className="pointer-events-auto relative z-50 flex h-full min-w-0 flex-1 cursor-pointer touch-manipulation items-center justify-center rounded-full text-center text-lg font-semibold text-white shadow-sm transition-colors duration-500"
             style={{ backgroundColor: accent }}
           >
             All Packs
@@ -252,11 +256,11 @@ export default function GameCard({
           <button
             type="button"
             data-no-tap-nav
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => {
+            onPointerDownCapture={(e) => {
+              e.stopPropagation();
               void handleShare();
             }}
-            className="pointer-events-auto relative z-50 flex h-full min-w-0 flex-1 cursor-pointer items-center justify-center rounded-full border-2 bg-white text-center text-lg font-semibold transition-colors duration-500"
+            className="pointer-events-auto relative z-50 flex h-full min-w-0 flex-1 cursor-pointer touch-manipulation items-center justify-center rounded-full border-2 bg-white text-center text-lg font-semibold transition-colors duration-500"
             style={{ borderColor: accent, color: accent }}
           >
             Send to Friend 👉

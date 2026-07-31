@@ -40,6 +40,8 @@ export default function CardStack({
   const didDrag = useRef(false);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const [dragEnabled, setDragEnabled] = useState(true);
+  /** Während Fly-out: darunterliegende Karte tappbar machen (Footer/Store). */
+  const [flyDir, setFlyDir] = useState<-1 | 1 | null>(null);
 
   const current = cards[index];
   const next = cards[index + 1];
@@ -74,6 +76,7 @@ export default function CardStack({
 
   function flyOut(direction: -1 | 1, callback: () => void) {
     isFlying.current = true;
+    setFlyDir(direction);
     animate(x, direction * FLY_OUT_DISTANCE, {
       type: "tween",
       duration: 0.28,
@@ -82,6 +85,7 @@ export default function CardStack({
         callback();
         x.set(0);
         isFlying.current = false;
+        setFlyDir(null);
       },
     });
   }
@@ -145,9 +149,11 @@ export default function CardStack({
       {next && (
         <motion.div
           key={`next-${next.id}`}
-          aria-hidden
+          aria-hidden={flyDir !== -1}
           style={{ opacity: showNext }}
-          className="pointer-events-none absolute inset-0 z-0 border-none outline-none [backface-visibility:hidden]"
+          className={`absolute inset-0 z-0 border-none outline-none [backface-visibility:hidden] ${
+            flyDir === -1 ? "pointer-events-auto" : "pointer-events-none"
+          }`}
         >
           {renderCard(next, index + 1)}
         </motion.div>
@@ -155,9 +161,11 @@ export default function CardStack({
       {prev && (
         <motion.div
           key={`prev-${prev.id}`}
-          aria-hidden
+          aria-hidden={flyDir !== 1}
           style={{ opacity: showPrev }}
-          className="pointer-events-none absolute inset-0 z-0 border-none outline-none [backface-visibility:hidden]"
+          className={`absolute inset-0 z-0 border-none outline-none [backface-visibility:hidden] ${
+            flyDir === 1 ? "pointer-events-auto" : "pointer-events-none"
+          }`}
         >
           {renderCard(prev, prevIndex)}
         </motion.div>
@@ -165,9 +173,11 @@ export default function CardStack({
 
       <motion.div
         key={current.id}
-        className="pointer-events-auto absolute inset-0 z-10 cursor-grab border-none outline-none [backface-visibility:hidden] active:cursor-grabbing"
+        className={`absolute inset-0 z-10 cursor-grab border-none outline-none [backface-visibility:hidden] active:cursor-grabbing ${
+          flyDir !== null ? "pointer-events-none" : "pointer-events-auto"
+        }`}
         style={{ x, rotate, touchAction: "none" }}
-        drag={dragEnabled ? "x" : false}
+        drag={dragEnabled && flyDir === null ? "x" : false}
         dragElastic={0.6}
         dragMomentum={false}
         dragConstraints={{ left: 0, right: 0 }}
