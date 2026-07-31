@@ -252,9 +252,9 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
         </AnimatePresence>
       </div>
 
-      {/* Footer: Home-Indicator (safe-area) + nur bei Overlay-Chrome (Liquid Glass)
-          die gemessene Leistenhöhe — sonst 0, weil der Frame schon schrumpft. */}
-      <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-start gap-3 px-6 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom,0px)+var(--overlay-chrome-bottom,0px))]">
+      {/* Footer: am Flex-Ende, Safe-Area für Home-Indicator.
+          Chrome-Clearance kommt vom inset-0 Frame (iOS clippt über der Leiste). */}
+      <div className="relative z-10 mt-auto flex w-full shrink-0 flex-col gap-3 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <span
           className="text-center font-oswald text-lg font-bold tracking-widest uppercase transition-colors duration-500"
           style={{ color: accent }}

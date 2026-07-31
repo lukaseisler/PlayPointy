@@ -5,44 +5,44 @@
   --foreground: #171717;
   --font-fredoka: "Fredoka", sans-serif;
   --font-oswald: "Oswald", sans-serif;
-  --app-height: 100dvh;
-  --app-top: 0px;
-  --overlay-chrome-bottom: 0px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-fredoka);
-  /* Erzeugt die Tailwind-Utility `font-oswald` fuer den Pack-Namen. */
   --font-oswald: var(--font-oswald);
 }
 
-/* `overflow: hidden` reicht aus, um Rubber-Band-Scrolling zu verhindern.
-   Absichtlich KEIN zusaetzliches `position: fixed` auf html/body: PhoneFrame
-   setzt bereits selbst `fixed inset-0 h-dvh` auf seinen eigenen Wrapper-Div.
-   Ein doppeltes `position: fixed` (Body + PhoneFrame uebereinander) ist eine
-   bekannte Ursache fuer kaputte Touch-/Scroll-Weiterleitung auf mobilen
-   WebKit/Blink-Browsern (die Seite wirkt dann eingefroren, obwohl React
-   laeuft) - daher bewusst nur auf dem inneren Frame, nicht auf body/html. */
-html,
+/*
+ * WICHTIG für iOS Safari: KEIN overflow:hidden auf html/body.
+ * Das friert den Layout-Viewport ein und lässt die Adressleiste als
+ * Overlay über der App liegen. Scroll-Lock nur im Game-Surface.
+ */
+html {
+  height: 100%;
+  overscroll-behavior: none;
+  background-color: #ffffff;
+}
+
 body {
   height: 100%;
-  overflow: hidden;
+  margin: 0;
   overscroll-behavior: none;
-}
-
-body {
-  background: var(--background);
+  background-color: #ffffff;
   color: var(--foreground);
   font-family: var(--font-fredoka);
+  /* Verhindert Document-Scroll, ohne den Safari-Viewport zu locken. */
+  position: fixed;
+  inset: 0;
+  width: 100%;
 }
 
-/* Kein Text markierbar/kopierbar im Spielbereich – fühlt sich mehr wie eine App an. */
 .game-surface {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+  overscroll-behavior: none;
 }
 
 .no-scrollbar::-webkit-scrollbar {

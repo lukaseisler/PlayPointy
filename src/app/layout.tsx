@@ -63,7 +63,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body className="h-full min-h-dvh bg-neutral-950 font-sans">
+      <body className="font-sans">
         {/* Ausserhalb von PhoneFrame's `overflow-hidden`-Containern gemountet,
             damit die Fehlerbox garantiert sichtbar ist - auch wenn irgendwo
             tiefer im Baum etwas haengt/abstuerzt. */}
