@@ -72,12 +72,13 @@ export default function GameCard({
       <div className="min-h-0 flex-1 basis-0" aria-hidden />
 
       <div className="relative z-10 flex w-full shrink-0 flex-col">
-      {/* Feste Titelhöhe (2 Zeilen): Block bleibt kartenumabhängig auf derselben Y-Position. */}
-      <div className="flex flex-col gap-1 px-6 pt-6 pb-4">
+      {/* Feste Höhe für Label + 2 Titelzeilen: bei einzeiligem Titel wandern
+          Label und Name gemeinsam nach unten (Leerraum oben). */}
+      <div className="flex min-h-[calc(1.5rem+0.25rem+2*1.25*26px)] flex-col justify-end gap-1 px-6 pt-6 pb-4">
         <span className="text-base font-semibold tracking-wide text-neutral-700 uppercase">
           Who is more likely to
         </span>
-        <h1 className="flex min-h-[2lh] flex-col justify-end text-[26px] leading-tight font-semibold text-neutral-900">
+        <h1 className="text-[26px] leading-tight font-semibold text-neutral-900">
           {displayTitle(card.text)}
         </h1>
       </div>
