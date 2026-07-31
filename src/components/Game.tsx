@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CardStack from "./CardStack";
 import GameCard from "./GameCard";
 import PWANudge from "./PWANudge";
@@ -43,6 +43,8 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
   const [storeReason, setStoreReason] = useState<StoreReason | null>(null);
   const [pwaNudgeDismissed, setPwaNudgeDismissed] = useState(false);
   const [activePackIds, setActivePackIds] = useState<string[]>([FREE_PACK_ID]);
+  const [cardBurstTick, setCardBurstTick] = useState(0);
+  const skipFirstCardBurst = useRef(true);
   const isStandalonePwa = useIsStandalonePwa();
   const { canPrompt, kind: installKind } = usePwaInstallEligibility();
 
@@ -55,6 +57,16 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
     setCards(buildDeck(packIds, featuredCard));
     setIndex(0);
   }, [featuredCard]);
+
+  // Logo-Fountain bei Kartenwechsel (nicht beim allerersten Render).
+  useEffect(() => {
+    if (skipFirstCardBurst.current) {
+      skipFirstCardBurst.current = false;
+      return;
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- burst tick on index change
+    setCardBurstTick((t) => t + 1);
+  }, [index]);
 
   const total = cards.length;
   const current = cards[index];
@@ -110,6 +122,8 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
             index={i}
             total={totalAcrossAllPacks}
             onOpenStore={() => setStoreReason("manual")}
+            isActive={i === index}
+            cardBurstSignal={cardBurstTick}
           />
         )}
       />

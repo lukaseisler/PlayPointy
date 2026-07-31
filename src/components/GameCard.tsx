@@ -4,10 +4,11 @@ import { AnimatePresence, motion, useAnimation } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import CounterLogoBurst from "@/components/CounterLogoBurst";
+import { useIsStandalonePwa } from "@/hooks/useIsStandalonePwa";
 import { displayTitle } from "@/lib/data";
 import { shareCard } from "@/lib/share";
 import type { Card } from "@/lib/types";
-import { useIsStandalonePwa } from "@/hooks/useIsStandalonePwa";
 
 interface GameCardProps {
   card: Card;
@@ -15,55 +16,25 @@ interface GameCardProps {
   index: number;
   total: number;
   onOpenStore: () => void;
-}
-
-interface BurstParticle {
-  id: string;
-  x: number;
-  delay: number;
-  rotate: number;
-}
-
-function CardCounterBurst({ burstKey }: { burstKey: number }) {
-  const particles: BurstParticle[] = Array.from({ length: 6 }, (_, i) => ({
-    id: `${burstKey}-${i}`,
-    x: (i - 2.5) * 14,
-    delay: i * 0.04,
-    rotate: (i - 2.5) * 12,
-  }));
-
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex justify-end pr-2">
-      <AnimatePresence>
-        {particles.map((p) => (
-          <motion.span
-            key={p.id}
-            initial={{ opacity: 0, y: 8, scale: 0.4, x: 0 }}
-            animate={{
-              opacity: [0, 1, 1, 0],
-              y: [8, -12, -48, -72],
-              x: p.x,
-              scale: [0.4, 1.1, 1, 0.7],
-              rotate: p.rotate,
-            }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.75, delay: p.delay, ease: "easeOut" }}
-            className="absolute top-0 right-6 text-lg"
-            aria-hidden
-          >
-            🎴
-          </motion.span>
-        ))}
-      </AnimatePresence>
-    </div>
-  );
+  /** Nur die vordere Karte burstet — verhindert Dauerfeuer von Next/Prev-Karten. */
+  isActive?: boolean;
+  /** Inkrement vom Parent bei Kartenwechsel. */
+  cardBurstSignal?: number;
 }
 
 /**
  * Eine einzelne Spielkarte. Färbt sich komplett passend zu `card.hex`
  * (Hintergrund der Bildfläche, Pack-Label, beide Buttons).
  */
-export default function GameCard({ card, position, index, total, onOpenStore }: GameCardProps) {
+export default function GameCard({
+  card,
+  position,
+  index,
+  total,
+  onOpenStore,
+  isActive = false,
+  cardBurstSignal = 0,
+}: GameCardProps) {
   const accent = card.hex;
   const [infoOpen, setInfoOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -76,6 +47,13 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
     const t = window.setTimeout(() => setToast(null), 1800);
     return () => window.clearTimeout(t);
   }, [toast]);
+
+  // Fountain bei Kartenwechsel (Signal vom Game-Parent).
+  useEffect(() => {
+    if (!isActive || cardBurstSignal <= 0) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync burst from parent signal
+    setBurstKey((k) => k + 1);
+  }, [cardBurstSignal, isActive]);
 
   async function handleShare() {
     const result = await shareCard(card);
@@ -108,9 +86,24 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
       </div>
 
       <div
-        className="relative z-10 aspect-[4/5] w-full flex-none shrink-0 overflow-hidden transition-colors duration-500"
+        className="relative z-10 aspect-[4/5] w-full flex-none shrink-0 transition-colors duration-500"
         style={{ backgroundColor: accent }}
       >
+        {/* Bild separat clippen, damit Logo-Fountain über den Rand fliegen darf. */}
+        <div className="absolute inset-0 overflow-hidden">
+          {card.image ? (
+            <Image
+              src={`/${card.image}`}
+              alt={displayTitle(card.text)}
+              fill
+              draggable={false}
+              priority
+              sizes="(max-width: 480px) 100vw, 480px"
+              className="pointer-events-none object-contain object-bottom select-none"
+            />
+          ) : null}
+        </div>
+
         <motion.button
           type="button"
           aria-label="PlayPointy"
@@ -134,7 +127,7 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
           />
         </motion.button>
 
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-4 right-4 z-20 overflow-visible">
           <button
             type="button"
             data-no-tap-nav
@@ -144,21 +137,11 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
             className="pointer-events-auto relative cursor-pointer border-0 bg-transparent p-0 text-[22px] font-medium tracking-wide text-white"
           >
             {position} / {total}
+            {isActive && burstKey > 0 && (
+              <CounterLogoBurst key={burstKey} burstKey={burstKey} />
+            )}
           </button>
-          {burstKey > 0 && <CardCounterBurst key={burstKey} burstKey={burstKey} />}
         </div>
-
-        {card.image ? (
-          <Image
-            src={`/${card.image}`}
-            alt={displayTitle(card.text)}
-            fill
-            draggable={false}
-            priority
-            sizes="(max-width: 480px) 100vw, 480px"
-            className="pointer-events-none object-contain object-bottom select-none"
-          />
-        ) : null}
 
         {index === 0 && !infoOpen && !isStandalonePwa && (
           <motion.div
