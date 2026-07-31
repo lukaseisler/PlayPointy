@@ -252,8 +252,9 @@ export default function GameCard({ card, position, index, total, onOpenStore }: 
         </AnimatePresence>
       </div>
 
-      {/* Footer: Safe-Area-Padding, damit iOS Safari die Buttons nicht verdeckt. */}
-      <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-start gap-3 px-6 pt-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+      {/* Footer: Home-Indicator (safe-area) + nur bei Overlay-Chrome (Liquid Glass)
+          die gemessene Leistenhöhe — sonst 0, weil der Frame schon schrumpft. */}
+      <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-start gap-3 px-6 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom,0px)+var(--overlay-chrome-bottom,0px))]">
         <span
           className="text-center font-oswald text-lg font-bold tracking-widest uppercase transition-colors duration-500"
           style={{ color: accent }}

@@ -89,7 +89,7 @@ export default function StoreModal({
           onClick={onClose}
         >
           <motion.div
-            className="no-scrollbar relative max-h-[85%] overflow-y-auto rounded-t-[2rem] bg-white pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))]"
+            className="no-scrollbar relative max-h-[85%] overflow-y-auto rounded-t-[2rem] bg-white pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px)+var(--overlay-chrome-bottom,0px))]"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
