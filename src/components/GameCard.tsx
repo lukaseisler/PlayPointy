@@ -170,7 +170,7 @@ export default function GameCard({
         </button>
         {/* Rein dekorativ – Klicks fallen durch aufs rechte Drittel (nächste Karte). */}
         <span
-          className="pointer-events-none absolute right-1.5 bottom-3 z-30 origin-bottom-right text-[14px] font-medium tracking-wide text-white/90"
+          className="pointer-events-none absolute right-1.5 bottom-3 z-30 origin-bottom-right text-[15.5px] font-medium tracking-wide text-white/90"
           style={{ writingMode: "vertical-rl" }}
           aria-hidden
         >
