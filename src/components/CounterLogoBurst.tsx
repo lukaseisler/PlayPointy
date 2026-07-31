@@ -5,59 +5,40 @@ import { useMemo } from "react";
 
 interface LogoBurstParticle {
   id: string;
+  /** Endposition relativ zum Counter-Ursprung */
   x: number;
   y: number;
   rotate: number;
-  spin: number;
-  delay: number;
   duration: number;
   scale: number;
 }
 
-/** Nur nach unten, links und schräg unten-links — nicht in den weißen Header. */
-function createFountain(burstKey: number, count = 6): LogoBurstParticle[] {
-  let seed = burstKey * 9973 + 11;
-  const rand = () => {
-    seed = (seed * 16807) % 2147483647;
-    return (seed & 0x7fffffff) / 0x7fffffff;
-  };
-
-  // Richtungs-Slots: links, schräg unten-links, unten (je 2)
-  const dirs = [
-    { x: -1, y: 0.15 },
-    { x: -0.85, y: 0.55 },
-    { x: -0.55, y: 0.85 },
-    { x: -0.25, y: 1 },
-    { x: -0.7, y: 0.7 },
-    { x: -0.4, y: 0.95 },
+/**
+ * 4 Logos gleichzeitig — Feuerwerk in Zeitlupe:
+ * 1) links am oberen Rand
+ * 2–3) schräg dazwischen
+ * 4) senkrecht nach unten am rechten Rand
+ */
+function createFirework(burstKey: number): LogoBurstParticle[] {
+  const paths = [
+    { x: -110, y: 8, rotate: -28, scale: 0.95 }, // links, oben
+    { x: -78, y: 52, rotate: -12, scale: 1 }, // schräg
+    { x: -42, y: 88, rotate: 10, scale: 0.95 }, // schräg
+    { x: -6, y: 118, rotate: 22, scale: 1 }, // unten, rechts
   ] as const;
 
-  return Array.from({ length: count }, (_, i) => {
-    const dir = dirs[i % dirs.length]!;
-    const dist = 52 + rand() * 48;
-    const x = dir.x * dist + (rand() - 0.5) * 12;
-    const y = dir.y * dist + rand() * 18;
-    const rotate = (rand() - 0.5) * 160;
-    const spin = rotate + (rand() > 0.5 ? 40 : -40);
-
-    return {
-      id: `${burstKey}-${i}`,
-      x,
-      y,
-      rotate,
-      spin,
-      delay: i * 0.05,
-      duration: 1.15 + rand() * 0.35,
-      scale: 0.45 + rand() * 0.25,
-    };
-  });
+  return paths.map((p, i) => ({
+    id: `${burstKey}-${i}`,
+    x: p.x,
+    y: p.y,
+    rotate: p.rotate,
+    duration: 1.35,
+    scale: p.scale,
+  }));
 }
 
-/**
- * Sanfter Logo-Fountain: 6 kleine Logos schweben nach links / unten.
- */
 export default function CounterLogoBurst({ burstKey }: { burstKey: number }) {
-  const particles = useMemo(() => createFountain(burstKey), [burstKey]);
+  const particles = useMemo(() => createFirework(burstKey), [burstKey]);
 
   return (
     <div
@@ -70,48 +51,44 @@ export default function CounterLogoBurst({ burstKey }: { burstKey: number }) {
           src="/logo.png"
           alt=""
           draggable={false}
-          initial={{ opacity: 0, x: 0, y: 0, scale: 0.2, rotate: 0 }}
+          initial={{ opacity: 0, x: 0, y: 0, scale: 0.35, rotate: 0 }}
           animate={{
-            opacity: [0, 0.95, 0.85, 0],
-            x: [0, p.x * 0.45, p.x],
-            y: [0, p.y * 0.4, p.y],
-            scale: [0.2, p.scale, p.scale * 0.85],
-            rotate: [0, p.rotate, p.spin],
+            opacity: [0, 1, 1, 0],
+            x: [0, p.x * 0.55, p.x],
+            y: [0, p.y * 0.45, p.y],
+            scale: [0.35, p.scale, p.scale * 0.9],
+            rotate: [0, p.rotate * 0.6, p.rotate],
           }}
           transition={{
+            // Alle gleichzeitig — ein Abschuss
+            delay: 0,
             duration: p.duration,
-            delay: p.delay,
             opacity: {
               duration: p.duration,
-              delay: p.delay,
-              times: [0, 0.12, 0.7, 1],
+              times: [0, 0.08, 0.65, 1],
               ease: "easeOut",
             },
             x: {
               duration: p.duration,
-              delay: p.delay,
-              times: [0, 0.5, 1],
+              times: [0, 0.4, 1],
               ease: ["easeOut", "easeInOut"],
             },
             y: {
               duration: p.duration,
-              delay: p.delay,
-              times: [0, 0.5, 1],
+              times: [0, 0.4, 1],
               ease: ["easeOut", "easeInOut"],
             },
             rotate: {
               duration: p.duration,
-              delay: p.delay,
-              ease: "easeInOut",
+              ease: "easeOut",
             },
             scale: {
               duration: p.duration,
-              delay: p.delay,
-              times: [0, 0.25, 1],
+              times: [0, 0.2, 1],
               ease: "easeOut",
             },
           }}
-          className="absolute top-0 left-0 h-4 w-auto max-w-none origin-center select-none drop-shadow-md"
+          className="absolute top-0 left-0 h-8 w-auto max-w-none origin-center select-none drop-shadow-md"
           style={{ backfaceVisibility: "hidden", willChange: "transform, opacity" }}
         />
       ))}
