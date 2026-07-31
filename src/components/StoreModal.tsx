@@ -75,7 +75,7 @@ export default function StoreModal({
 
   const subtitle =
     reason === "limit"
-      ? "You've played all 30 free cards. Unlock more packs and keep going!"
+      ? `You've played all 30 free cards. ${catchphrase}`
       : catchphrase;
 
   return (
