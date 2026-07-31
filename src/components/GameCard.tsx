@@ -72,13 +72,13 @@ export default function GameCard({
       <div className="min-h-0 flex-1 basis-0" aria-hidden />
 
       <div className="relative z-10 flex w-full shrink-0 flex-col">
-      {/* Feste Höhe für Label + 2 Titelzeilen: bei einzeiligem Titel wandern
-          Label und Name gemeinsam nach unten (Leerraum oben). */}
-      <div className="flex min-h-[calc(1.5rem+0.25rem+2*1.25*26px)] flex-col justify-end gap-1 px-6 pt-6 pb-4">
-        <span className="text-base font-semibold tracking-wide text-neutral-700 uppercase">
+      {/* Exakte Höhe (nicht min-height): Farbpanel + Buttons bleiben kartenumabhängig
+          auf derselben Y-Position. Einzeilige Titel → Block unten, Leerraum oben. */}
+      <div className="box-border flex h-[133px] shrink-0 flex-col justify-end gap-1 overflow-hidden px-6 pt-6 pb-4">
+        <span className="shrink-0 truncate text-base leading-none font-semibold tracking-wide text-neutral-700 uppercase">
           Who is more likely to
         </span>
-        <h1 className="text-[26px] leading-tight font-semibold text-neutral-900">
+        <h1 className="line-clamp-2 text-[26px] leading-tight font-semibold text-neutral-900">
           {displayTitle(card.text)}
         </h1>
       </div>
@@ -230,22 +230,21 @@ export default function GameCard({
         </AnimatePresence>
       </div>
 
-      {/* Footer: Safe-Area für Home-Indicator.
-          Chrome-Clearance kommt vom inset-0 Frame (iOS clippt über der Leiste). */}
-      <div className="flex w-full flex-col gap-3 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      {/* Footer: feste Höhen, Pack-Name eine Zeile — keine Layout-Sprünge pro Karte. */}
+      <div className="flex w-full shrink-0 flex-col gap-3 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <span
-          className="text-center font-oswald text-lg font-bold tracking-widest uppercase transition-colors duration-500"
+          className="h-7 truncate text-center font-oswald text-lg leading-7 font-bold tracking-widest uppercase transition-colors duration-500"
           style={{ color: accent }}
         >
           {card.pack}
         </span>
-        <div className="flex w-full gap-3">
+        <div className="flex h-12 w-full gap-3">
           <button
             type="button"
             data-no-tap-nav
             onPointerDown={(e) => e.stopPropagation()}
             onClick={onOpenStore}
-            className="pointer-events-auto relative z-50 min-w-0 flex-1 cursor-pointer rounded-full py-3 text-center text-lg font-semibold text-white shadow-sm transition-colors duration-500"
+            className="pointer-events-auto relative z-50 flex h-full min-w-0 flex-1 cursor-pointer items-center justify-center rounded-full text-center text-lg font-semibold text-white shadow-sm transition-colors duration-500"
             style={{ backgroundColor: accent }}
           >
             All Packs
@@ -257,7 +256,7 @@ export default function GameCard({
             onClick={() => {
               void handleShare();
             }}
-            className="pointer-events-auto relative z-50 min-w-0 flex-1 cursor-pointer rounded-full border-2 bg-white py-3 text-center text-lg font-semibold transition-colors duration-500"
+            className="pointer-events-auto relative z-50 flex h-full min-w-0 flex-1 cursor-pointer items-center justify-center rounded-full border-2 bg-white text-center text-lg font-semibold transition-colors duration-500"
             style={{ borderColor: accent, color: accent }}
           >
             Send to Friend 👉
