@@ -167,7 +167,7 @@ export default function CardStack({
 
   return (
     <div
-      className="relative isolate min-h-0 flex-1 overflow-hidden"
+      className="relative isolate min-h-0 flex-1 overflow-x-hidden overflow-y-visible"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}

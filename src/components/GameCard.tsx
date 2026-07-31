@@ -69,13 +69,18 @@ export default function GameCard({
     });
   }
 
-  function handleCounterTap(e: React.MouseEvent) {
-    e.stopPropagation();
+  function triggerBurst() {
     setBurstKey((k) => k + 1);
   }
 
+  function handleCounterPointerDown(e: React.PointerEvent) {
+    // Capture-Phase: bevor Framer-Motion am CardStack den Drag startet.
+    e.stopPropagation();
+    triggerBurst();
+  }
+
   return (
-    <div className="relative isolate flex h-full w-full flex-col overflow-hidden bg-white">
+    <div className="relative isolate flex h-full w-full flex-col overflow-x-hidden overflow-y-visible bg-white">
       <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end gap-1 px-6 pt-8 pb-4">
         <span className="text-base font-semibold tracking-wide text-neutral-700 uppercase">
           Who is more likely to
@@ -86,7 +91,7 @@ export default function GameCard({
       </div>
 
       <div
-        className="relative z-10 aspect-[4/5] w-full flex-none shrink-0 transition-colors duration-500"
+        className="relative z-10 aspect-[4/5] w-full flex-none shrink-0 overflow-visible transition-colors duration-500"
         style={{ backgroundColor: accent }}
       >
         {/* Bild separat clippen, damit Logo-Fountain über den Rand fliegen darf. */}
@@ -127,21 +132,18 @@ export default function GameCard({
           />
         </motion.button>
 
-        <div className="absolute top-4 right-4 z-20 overflow-visible">
-          <button
-            type="button"
-            data-no-tap-nav
-            aria-label={`${position} of ${total} cards`}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={handleCounterTap}
-            className="pointer-events-auto relative cursor-pointer border-0 bg-transparent p-0 text-[22px] font-medium tracking-wide text-white"
-          >
-            {position} / {total}
-            {isActive && burstKey > 0 && (
-              <CounterLogoBurst key={burstKey} burstKey={burstKey} />
-            )}
-          </button>
-        </div>
+        <button
+          type="button"
+          data-no-tap-nav
+          aria-label={`${position} of ${total} cards`}
+          onPointerDownCapture={handleCounterPointerDown}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+          className="pointer-events-auto absolute top-4 right-4 z-50 cursor-pointer touch-manipulation border-0 bg-transparent px-1 py-0.5 text-[22px] font-medium tracking-wide text-white"
+        >
+          {position} / {total}
+          {burstKey > 0 && <CounterLogoBurst key={burstKey} burstKey={burstKey} />}
+        </button>
 
         {index === 0 && !infoOpen && !isStandalonePwa && (
           <motion.div
