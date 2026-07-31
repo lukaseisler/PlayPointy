@@ -19,10 +19,10 @@ export default function ImprintPage() {
       </p>
       <p>
         <a
-          href="mailto:lukas@eisler.at"
+          href="mailto:hello@playpointy.com"
           className="text-neutral-900 underline underline-offset-2"
         >
-          lukas@eisler.at
+          hello@playpointy.com
         </a>
       </p>
 

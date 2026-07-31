@@ -5,7 +5,6 @@ import { useMemo } from "react";
 
 interface LogoBurstParticle {
   id: string;
-  /** Endposition relativ zum Counter-Ursprung */
   x: number;
   y: number;
   rotate: number;
@@ -14,17 +13,15 @@ interface LogoBurstParticle {
 }
 
 /**
- * 4 Logos gleichzeitig — Feuerwerk in Zeitlupe:
- * 1) links am oberen Rand
- * 2–3) schräg dazwischen
- * 4) senkrecht nach unten am rechten Rand
+ * 4 Logos gleichzeitig — Feuerwerk in Zeitlupe, weiter gespreizt:
+ * links oben → 2× schräg → senkrecht unten rechts.
  */
 function createFirework(burstKey: number): LogoBurstParticle[] {
   const paths = [
-    { x: -110, y: 8, rotate: -28, scale: 0.95 }, // links, oben
-    { x: -78, y: 52, rotate: -12, scale: 1 }, // schräg
-    { x: -42, y: 88, rotate: 10, scale: 0.95 }, // schräg
-    { x: -6, y: 118, rotate: 22, scale: 1 }, // unten, rechts
+    { x: -155, y: 10, rotate: -32, scale: 1 },
+    { x: -108, y: 78, rotate: -14, scale: 1.05 },
+    { x: -58, y: 130, rotate: 12, scale: 1 },
+    { x: -8, y: 175, rotate: 26, scale: 1.05 },
   ] as const;
 
   return paths.map((p, i) => ({
@@ -32,7 +29,7 @@ function createFirework(burstKey: number): LogoBurstParticle[] {
     x: p.x,
     y: p.y,
     rotate: p.rotate,
-    duration: 1.35,
+    duration: 1.4,
     scale: p.scale,
   }));
 }
@@ -60,7 +57,6 @@ export default function CounterLogoBurst({ burstKey }: { burstKey: number }) {
             rotate: [0, p.rotate * 0.6, p.rotate],
           }}
           transition={{
-            // Alle gleichzeitig — ein Abschuss
             delay: 0,
             duration: p.duration,
             opacity: {
@@ -78,10 +74,7 @@ export default function CounterLogoBurst({ burstKey }: { burstKey: number }) {
               times: [0, 0.4, 1],
               ease: ["easeOut", "easeInOut"],
             },
-            rotate: {
-              duration: p.duration,
-              ease: "easeOut",
-            },
+            rotate: { duration: p.duration, ease: "easeOut" },
             scale: {
               duration: p.duration,
               times: [0, 0.2, 1],

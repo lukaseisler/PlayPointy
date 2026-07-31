@@ -16,18 +16,12 @@ interface CardStackProps {
 const SWIPE_DISTANCE_THRESHOLD = 110;
 const SWIPE_VELOCITY_THRESHOLD = 500;
 const FLY_OUT_DISTANCE = 600;
-/** Max. Bewegung, damit ein Pointer-Up noch als Tap (nicht Drag) gilt. */
 const TAP_MOVE_THRESHOLD = 12;
 
 /**
- * Zeigt die aktuelle Karte (per Drag/Swipe steuerbar) plus die Karte, die
- * beim Wegziehen sichtbar wird - exakt deckungsgleich dahinter.
- *
- * Zusätzlich: Tap linkes Drittel → zurück, Tap rechtes Drittel → weiter
- * (Mittelbereich bleibt frei für Lesen/Buttons).
- *
- * Mehrfinger-Touches deaktivieren den Drag kurzzeitig, damit iOS Safari die
- * native Pinch-Geste in die Tab-Übersicht behält.
+ * Kartenstapel mit Drag-Swipe + Tap linkes/rechtes Drittel.
+ * `touch-action: none` auf der aktiven Karte ist nötig, damit Framer Motion
+ * horizontale Swipes zuverlässig bekommt (nicht der Browser).
  */
 export default function CardStack({
   cards,
@@ -82,7 +76,8 @@ export default function CardStack({
     const offsetX = info.offset.x;
     const velocityX = info.velocity.x;
     const shouldSwipe =
-      Math.abs(offsetX) > SWIPE_DISTANCE_THRESHOLD || Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD;
+      Math.abs(offsetX) > SWIPE_DISTANCE_THRESHOLD ||
+      Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD;
 
     if (shouldSwipe) {
       const direction = offsetX !== 0 ? Math.sign(offsetX) : Math.sign(velocityX);
@@ -130,7 +125,6 @@ export default function CardStack({
     if (dx > TAP_MOVE_THRESHOLD || dy > TAP_MOVE_THRESHOLD) return;
 
     const target = e.target as HTMLElement | null;
-    // Interaktive Controls (Buttons, Links) haben Vorrang vor Tap-Navigation.
     if (target?.closest("button, a, input, textarea, [data-no-tap-nav]")) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
@@ -138,16 +132,13 @@ export default function CardStack({
     const relX = (e.clientX - rect.left) / rect.width;
 
     if (relX < 1 / 3) {
-      // Linkes Drittel → vorherige Karte (wie Swipe rechts)
       flyOut(1, onSwipeRight);
     } else if (relX > 2 / 3) {
-      // Rechtes Drittel → nächste Karte (wie Swipe links)
       flyOut(-1, onSwipeLeft);
     }
   }
 
   function handleTouchStart(e: React.TouchEvent) {
-    // Mehrfinger = native Browser-Geste (z. B. iOS Tab-Übersicht) → Drag aus.
     if (e.touches.length > 1) {
       setDragEnabled(false);
       didDrag.current = true;
@@ -163,11 +154,11 @@ export default function CardStack({
 
   if (!current) return null;
 
-  const dragProp = !dragEnabled ? false : isStandalonePwa ? "x" : true;
+  const dragProp = !dragEnabled ? false : isStandalonePwa ? ("x" as const) : true;
 
   return (
     <div
-      className="relative isolate min-h-0 flex-1 overflow-x-hidden overflow-y-visible"
+      className="relative isolate min-h-0 flex-1 touch-none overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
@@ -195,13 +186,8 @@ export default function CardStack({
 
       <motion.div
         key={current.id}
-        className="pointer-events-auto absolute inset-0 z-10 cursor-grab border-none outline-none [backface-visibility:hidden] active:cursor-grabbing"
-        style={{
-          x,
-          rotate,
-          // pinch-zoom erlaubt die iOS-Tab-Übersicht; pan-x für Karten-Swipe.
-          touchAction: isStandalonePwa ? "pan-x pinch-zoom" : "manipulation",
-        }}
+        className="pointer-events-auto absolute inset-0 z-10 cursor-grab touch-none border-none outline-none [backface-visibility:hidden] active:cursor-grabbing"
+        style={{ x, rotate, touchAction: "none" }}
         drag={dragProp}
         dragDirectionLock={true}
         dragElastic={

@@ -16,10 +16,6 @@ interface GameCardProps {
   index: number;
   total: number;
   onOpenStore: () => void;
-  /** Nur die vordere Karte burstet — verhindert Dauerfeuer von Next/Prev-Karten. */
-  isActive?: boolean;
-  /** Inkrement vom Parent bei Kartenwechsel. */
-  cardBurstSignal?: number;
 }
 
 /**
@@ -32,8 +28,6 @@ export default function GameCard({
   index,
   total,
   onOpenStore,
-  isActive = false,
-  cardBurstSignal = 0,
 }: GameCardProps) {
   const accent = card.hex;
   const [infoOpen, setInfoOpen] = useState(false);
@@ -47,13 +41,6 @@ export default function GameCard({
     const t = window.setTimeout(() => setToast(null), 1800);
     return () => window.clearTimeout(t);
   }, [toast]);
-
-  // Fountain bei Kartenwechsel (Signal vom Game-Parent).
-  useEffect(() => {
-    if (!isActive || cardBurstSignal <= 0) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync burst from parent signal
-    setBurstKey((k) => k + 1);
-  }, [cardBurstSignal, isActive]);
 
   async function handleShare() {
     const result = await shareCard(card);
@@ -170,7 +157,7 @@ export default function GameCard({
         </button>
         {/* Rein dekorativ – Klicks fallen durch aufs rechte Drittel (nächste Karte). */}
         <span
-          className="pointer-events-none absolute right-1.5 bottom-3 z-30 origin-bottom-right text-[15.5px] font-medium tracking-wide text-white/90"
+          className="pointer-events-none absolute right-1.5 bottom-3 z-30 origin-bottom-right text-[16.3px] font-medium tracking-wide text-white/90"
           style={{ writingMode: "vertical-rl" }}
           aria-hidden
         >
