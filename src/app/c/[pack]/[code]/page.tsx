@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import AuthProvider from "@/components/AuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Game from "@/components/Game";
 import PhoneFrame from "@/components/PhoneFrame";
@@ -87,11 +88,13 @@ export default async function ShareCardPage({ params }: SharePageProps) {
   return (
     <PhoneFrame>
       <ErrorBoundary>
-        <Game
-          initialCards={freeCards}
-          storePacks={storePacks}
-          featuredCard={featuredCard}
-        />
+        <AuthProvider>
+          <Game
+            initialCards={freeCards}
+            storePacks={storePacks}
+            featuredCard={featuredCard}
+          />
+        </AuthProvider>
       </ErrorBoundary>
     </PhoneFrame>
   );

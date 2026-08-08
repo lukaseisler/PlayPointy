@@ -1,6 +1,7 @@
 "use client";
 
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import CardStack from "./CardStack";
 import GameCard from "./GameCard";
 import PWANudge from "./PWANudge";
@@ -31,11 +32,7 @@ function withFeaturedFirst(cards: Card[], featured?: Card | null): Card[] {
 }
 
 /**
- * Orchestriert das Gameplay:
- * - hält die Kartenreihenfolge + aktuellen Index
- * - optional featuredCard (Share-Link): Viral Loop → danach aktive Packs
- * - Swipe links -> nächste Karte, nach letzter Karte -> Store-Modal
- * - Swipe rechts -> vorherige Karte (auf Index 0: nächste, nahtlos weiter)
+ * Orchestriert das Gameplay + Deck-Rebuild nach Auth/Restore/Kauf.
  */
 export default function Game({ initialCards, storePacks, featuredCard = null }: GameProps) {
   const [cards, setCards] = useState<Card[]>(() => withFeaturedFirst(initialCards, featuredCard));
@@ -43,30 +40,89 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
   const [storeReason, setStoreReason] = useState<StoreReason | null>(null);
   const [pwaNudgeDismissed, setPwaNudgeDismissed] = useState(false);
   const [activePackIds, setActivePackIds] = useState<string[]>([FREE_PACK_ID]);
+  const [toast, setToast] = useState<string | null>(null);
   const isStandalonePwa = useIsStandalonePwa();
   const { canPrompt, kind: installKind } = usePwaInstallEligibility();
+  const {
+    authReady,
+    user,
+    entitlementsStatus,
+    deckEpoch,
+    checkoutNotice,
+    clearCheckoutNotice,
+  } = useAuth();
+  const initialMountDone = useRef(false);
+  const lastDeckEpoch = useRef(0);
+  /** Toggle im Store: neues Deck erst beim nächsten Kartenwechsel. */
+  const pendingToggleRebuild = useRef(false);
 
-  // Aktive Packs aus localStorage. useLayoutEffect: vor dem Paint, damit kein
-  // sichtbarer Karten-Flash entsteht. Gäste mit nur Starter behalten das
-  // SSR-Deck (kein zweites Shuffle) — siehe page.tsx Kommentar.
+  // Gäste / SSR: activePacks vor Paint. Session-User: auf Entitlements warten.
   useLayoutEffect(() => {
+    if (!authReady) return;
+
+    if (user && entitlementsStatus !== "ready" && entitlementsStatus !== "error") {
+      return;
+    }
+
     const packIds = readActivePackIds();
     setActivePackIds(packIds);
 
     const keepServerDeck =
-      !featuredCard && packIds.length === 1 && packIds[0] === FREE_PACK_ID;
+      !featuredCard &&
+      !user &&
+      packIds.length === 1 &&
+      packIds[0] === FREE_PACK_ID &&
+      !initialMountDone.current;
+
+    initialMountDone.current = true;
+
     if (keepServerDeck) return;
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- client deck from localStorage after SSR seed
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- client deck sync
     setCards(buildDeck(packIds, featuredCard));
     setIndex(0);
-  }, [featuredCard]);
+  }, [authReady, user, entitlementsStatus, featuredCard]);
+
+  // Restore / Logout / Kauf → deckEpoch: neu bauen (ohne Featured erneut zu erzwingen).
+  useEffect(() => {
+    if (deckEpoch === 0 || deckEpoch === lastDeckEpoch.current) return;
+    lastDeckEpoch.current = deckEpoch;
+    pendingToggleRebuild.current = false;
+    const packIds = readActivePackIds();
+    setActivePackIds(packIds);
+    setCards(buildDeck(packIds, null));
+    setIndex(0);
+  }, [deckEpoch]);
+
+  useEffect(() => {
+    if (!checkoutNotice) return;
+    setToast(checkoutNotice);
+    clearCheckoutNotice();
+  }, [checkoutNotice, clearCheckoutNotice]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = window.setTimeout(() => setToast(null), 3200);
+    return () => window.clearTimeout(t);
+  }, [toast]);
 
   const total = cards.length;
   const current = cards[index];
   const totalAcrossAllPacks = storePacks.reduce((sum, pack) => sum + pack.cardCount, 0);
 
+  function rebuildDeckFromActivePacks() {
+    const packIds = readActivePackIds();
+    setActivePackIds(packIds);
+    setCards(buildDeck(packIds, null));
+    setIndex(0);
+    pendingToggleRebuild.current = false;
+  }
+
   function handleSwipeLeft() {
+    if (pendingToggleRebuild.current) {
+      rebuildDeckFromActivePacks();
+      return;
+    }
     if (index < total - 1) {
       setIndex((i) => i + 1);
     } else {
@@ -75,6 +131,10 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
   }
 
   function handleSwipeRight() {
+    if (pendingToggleRebuild.current) {
+      rebuildDeckFromActivePacks();
+      return;
+    }
     if (index === 0) {
       if (total > 1) setIndex(1);
       return;
@@ -85,12 +145,26 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
   function handleActivePacksChange(next: string[]) {
     setActivePackIds(next);
     writeActivePackIds(next);
+    pendingToggleRebuild.current = true;
   }
 
   function handleReshuffle() {
+    pendingToggleRebuild.current = false;
     setCards(buildDeck(activePackIds, null));
     setIndex(0);
     setStoreReason(null);
+  }
+
+  const waitingForPacks =
+    Boolean(user) && entitlementsStatus !== "ready" && entitlementsStatus !== "error";
+
+  if (waitingForPacks) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-2 bg-white px-6 text-center">
+        <p className="text-base font-semibold text-neutral-800">Loading your packs…</p>
+        <p className="text-sm text-neutral-500">Just a moment</p>
+      </div>
+    );
   }
 
   if (!current) return null;
@@ -137,6 +211,14 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
         onClose={() => setStoreReason(null)}
         onReshuffle={handleReshuffle}
       />
+
+      {toast && (
+        <div className="pointer-events-none absolute inset-x-4 bottom-28 z-[70] flex justify-center">
+          <p className="rounded-2xl bg-neutral-900/90 px-4 py-3 text-center text-sm font-medium text-white shadow-lg">
+            {toast}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

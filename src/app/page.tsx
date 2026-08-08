@@ -1,3 +1,4 @@
+import AuthProvider from "@/components/AuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Game from "@/components/Game";
 import PhoneFrame from "@/components/PhoneFrame";
@@ -23,7 +24,9 @@ export default function Home() {
   return (
     <PhoneFrame>
       <ErrorBoundary>
-        <Game initialCards={freeCards} storePacks={storePacks} />
+        <AuthProvider>
+          <Game initialCards={freeCards} storePacks={storePacks} />
+        </AuthProvider>
       </ErrorBoundary>
     </PhoneFrame>
   );

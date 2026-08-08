@@ -55,8 +55,8 @@ export default function PrivacyPage() {
         <ul className="list-disc space-y-2 pl-5">
           <li>
             <strong>Account Data:</strong> Email address and OAuth user
-            identifiers provided by Google or Apple when logging in or creating
-            an account.
+            identifiers provided by Google, or email address when signing in
+            with a one-time code, when logging in or creating an account.
           </li>
           <li>
             <strong>Transaction &amp; Purchase Data:</strong> Order history,
@@ -114,11 +114,14 @@ export default function PrivacyPage() {
         <ul className="list-disc space-y-2 pl-5">
           <li>
             <strong>Supabase:</strong> Backend database and user account
-            authentication (Google/Apple login).
+            authentication (Google sign-in and email one-time codes).
           </li>
           <li>
-            <strong>Google / Apple:</strong> OAuth identity providers for single
-            sign-on authentication.
+            <strong>Google:</strong> OAuth identity provider for sign-in.
+          </li>
+          <li>
+            <strong>Resend:</strong> Email delivery for one-time sign-in codes
+            (and transactional mail related to authentication).
           </li>
           <li>
             <strong>Stripe (including Apple Pay / Google Pay):</strong>{" "}
@@ -128,10 +131,6 @@ export default function PrivacyPage() {
             <strong>Cloudflare (Pages &amp; R2):</strong> Global hosting,
             content delivery, and network security for web assets and card
             images.
-          </li>
-          <li>
-            <strong>Brevo:</strong> Primarily EU-based email service provider
-            for news updates via Double Opt-In (DOI).
           </li>
         </ul>
       </Section>
@@ -147,9 +146,10 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Essential Local Storage (Game State):</strong> We use
-            browser &quot;Local Storage&quot; strictly to save your active game
-            selections and preferences locally on your device. This is strictly
-            necessary for core game functionality.
+            browser local storage and session storage to save active pack
+            selections, a short-lived purchase intent after sign-in, and a
+            cached list of unlocked packs on your device. This is strictly
+            necessary for core game and restore functionality.
           </li>
           <li>
             <strong>No Marketing or Tracking Cookies:</strong> We do not use
@@ -168,7 +168,7 @@ export default function PrivacyPage() {
       <Section title="6. Data Transfers to Third Countries (USA)">
         <p>
           Some service providers (e.g., Supabase, Stripe, Cloudflare, Google,
-          Apple) process data in third countries outside the European Economic
+          Resend) process data in third countries outside the European Economic
           Area (EEA), including the US. Transfers to certified US entities are
           based on the EU-U.S. Data Privacy Framework (DPF) or Standard
           Contractual Clauses (SCCs) approved by the European Commission.
@@ -217,11 +217,17 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Account Deletion (Right to Erasure):</strong> You can
-            request account deletion within the app or via email. Note: Account
-            deletion permanently removes your technical access to purchased
-            digital content. Statutory warranty and withdrawal rights remain
-            unaffected. Transaction records required for tax compliance will be
-            retained for the statutory period.
+            request account deletion via email at{" "}
+            <a
+              href="mailto:hello@playpointy.com"
+              className="text-neutral-900 underline underline-offset-2"
+            >
+              hello@playpointy.com
+            </a>
+            . Note: Account deletion permanently removes your technical access
+            to purchased digital content. Statutory warranty and withdrawal
+            rights remain unaffected. Transaction records required for tax
+            compliance will be retained for the statutory period.
           </li>
           <li>
             <strong>Withdrawal of Consent:</strong> You may withdraw email
