@@ -1,9 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr";
-import { getSupabaseEnv } from "./env";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./publicConfig";
 
-/** Browser-Client. `null`, wenn Env fehlt (Gast-Modus ohne Auth). */
+/** Browser Supabase client. */
 export function createClient() {
-  const env = getSupabaseEnv();
-  if (!env) return null;
-  return createBrowserClient(env.url, env.anonKey);
+  return createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }

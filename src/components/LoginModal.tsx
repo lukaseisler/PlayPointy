@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { isInAppBrowser } from "@/lib/inAppBrowser";
 import { markResumeAfterAuth } from "@/lib/pendingCheckout";
 import { createClient } from "@/lib/supabase/client";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { isSupabaseConfigured } from "@/lib/supabase/publicConfig";
 
 type Step = "choose" | "email" | "otp";
 

@@ -28,7 +28,7 @@ import { mergeActiveWithOwned, sanitizeUnlockedPackIds } from "@/lib/ownedPacks"
 import { writeActivePackIds, readActivePackIds } from "@/lib/activePacks";
 import type { StoreReason } from "@/lib/storeTypes";
 import { createClient } from "@/lib/supabase/client";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { isSupabaseConfigured } from "@/lib/supabase/publicConfig";
 
 export type EntitlementsStatus = "idle" | "loading" | "ready" | "error";
 

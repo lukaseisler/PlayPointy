@@ -1,13 +1,8 @@
-const SUPABASE_URL = "https://uxylwvshvvwgpcxzepog.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_CpbLbsAELTx5LMKt_ovrGA_yBa7TMcJ";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./publicConfig";
 
-export function getSupabaseEnv(): { url: string; anonKey: string } | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || SUPABASE_ANON_KEY;
-  if (!url || !anonKey) return null;
-  return { url, anonKey };
+/** Shared public config (same values as the browser client). */
+export function getSupabaseEnv(): { url: string; anonKey: string } {
+  return { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY };
 }
 
-export function isSupabaseConfigured(): boolean {
-  return getSupabaseEnv() !== null;
-}
+export { isSupabaseConfigured } from "./publicConfig";
