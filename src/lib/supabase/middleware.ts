@@ -1,33 +1,9 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getSupabaseEnv } from "./env";
 
-/** Session-Cookies refreshen. Ohne Env: no-op. */
+/**
+ * No-op on Cloudflare: calling Supabase Auth here 500s the Worker.
+ * Session refresh stays in the browser AuthProvider.
+ */
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
-
-  const env = getSupabaseEnv();
-  if (!env) return supabaseResponse;
-
-  const supabase = createServerClient(env.url, env.anonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => {
-          request.cookies.set(name, value);
-        });
-        supabaseResponse = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) => {
-          supabaseResponse.cookies.set(name, value, options);
-        });
-      },
-    },
-  });
-
-  // getUser() refresht die Session — nicht weglassen.
-  await supabase.auth.getUser();
-
-  return supabaseResponse;
+  return NextResponse.next({ request });
 }
