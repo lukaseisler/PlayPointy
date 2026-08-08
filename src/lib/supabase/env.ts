@@ -1,8 +1,10 @@
-import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./publicConfig";
-
-/** Shared public config (same values as the browser client). */
-export function getSupabaseEnv(): { url: string; anonKey: string } {
-  return { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY };
+/**
+ * Server env only. No hardcoded fallbacks — those crashed the Cloudflare Worker
+ * when wired into createServerClient on every auth path.
+ */
+export function getSupabaseEnv(): { url: string; anonKey: string } | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return null;
+  return { url, anonKey };
 }
-
-export { isSupabaseConfigured } from "./publicConfig";

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 
 /**
  * OAuth code exchange (email OTP verifies client-side).
- * Query `next` steuert den Return-Pfad (default `/`).
+ * Needs server env; without it Google callback fails gracefully to /.
  */
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);

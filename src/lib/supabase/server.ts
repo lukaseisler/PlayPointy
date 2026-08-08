@@ -4,6 +4,8 @@ import { getSupabaseEnv } from "./env";
 
 export async function createClient() {
   const env = getSupabaseEnv();
+  if (!env) return null;
+
   const cookieStore = await cookies();
 
   return createServerClient(env.url, env.anonKey, {
@@ -17,7 +19,7 @@ export async function createClient() {
             cookieStore.set(name, value, options);
           });
         } catch {
-          /* Server Component — ignore if middleware already refreshed. */
+          /* ignore */
         }
       },
     },
