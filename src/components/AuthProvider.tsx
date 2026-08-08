@@ -140,18 +140,30 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     const supabase = createClient();
-    if (!supabase) {
-      setAuthReady(true);
-      return;
-    }
-
     let cancelled = false;
 
-    void supabase.auth.getUser().then(({ data }) => {
+    void (async () => {
+      // Finish Google OAuth PKCE in the browser (no server createServerClient).
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+        if (code) {
+          await supabase.auth.exchangeCodeForSession(code);
+          params.delete("code");
+          const qs = params.toString();
+          window.history.replaceState(
+            {},
+            "",
+            `${window.location.pathname}${qs ? `?${qs}` : ""}`,
+          );
+        }
+      }
+      if (cancelled) return;
+      const { data } = await supabase.auth.getUser();
       if (cancelled) return;
       setUser(data.user ?? null);
       setAuthReady(true);
-    });
+    })();
 
     const {
       data: { subscription },
