@@ -108,10 +108,6 @@ export default function LoginModal({
       return;
     }
     const supabase = createClient();
-    if (!supabase) {
-      setError("Sign-in is not configured yet.");
-      return;
-    }
     setBusy(true);
     const nextPath = `${window.location.pathname}${window.location.search}` || "/";
     const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
@@ -134,10 +130,6 @@ export default function LoginModal({
       return;
     }
     const supabase = createClient();
-    if (!supabase) {
-      setError("Sign-in is not configured yet.");
-      return;
-    }
     setBusy(true);
     const { error: otpError } = await supabase.auth.signInWithOtp({
       email: trimmed,
@@ -161,10 +153,6 @@ export default function LoginModal({
   async function verifyOtp(code: string) {
     if (code.length !== OTP_LENGTH) return;
     const supabase = createClient();
-    if (!supabase) {
-      setError("Sign-in is not configured yet.");
-      return;
-    }
     setBusy(true);
     setError(null);
     const { error: verifyError } = await supabase.auth.verifyOtp({

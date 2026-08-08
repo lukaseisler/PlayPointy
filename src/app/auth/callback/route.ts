@@ -1,9 +1,13 @@
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+
+/** Public anon credentials — used only on this OAuth callback route. */
+const SUPABASE_URL = "https://uxylwvshvvwgpcxzepog.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_CpbLbsAELTx5LMKt_ovrGA_yBa7TMcJ";
 
 /**
  * OAuth code exchange (email OTP verifies client-side).
- * Needs server env; without it Google callback fails gracefully to /.
  */
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -12,12 +16,27 @@ export async function GET(request: Request) {
   const safeNext = next.startsWith("/") ? next : "/";
 
   if (code) {
-    const supabase = await createClient();
-    if (supabase) {
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
-      if (!error) {
-        return NextResponse.redirect(`${origin}${safeNext}`);
-      }
+    const cookieStore = await cookies();
+    const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          } catch {
+            /* ignore */
+          }
+        },
+      },
+    });
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) {
+      return NextResponse.redirect(`${origin}${safeNext}`);
     }
   }
 
