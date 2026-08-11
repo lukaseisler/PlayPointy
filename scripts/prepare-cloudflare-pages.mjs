@@ -71,6 +71,8 @@ const routes = {
     "/favicon.ico",
     "/logo.png",
     "/playpointyapplogo.png",
+    "/logged_in_icon.webp",
+    "/pre_log_in_icon.webp",
     "/icon-192x192.png",
     "/icon-512x512.png",
     "/apple-touch-icon.png",

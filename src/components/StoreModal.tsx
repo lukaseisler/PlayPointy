@@ -8,6 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import type { PackSummary } from "@/lib/types";
 import { FREE_PACK_ID } from "@/lib/data";
 import { isOwnedPack } from "@/lib/ownedPacks";
+import { PACK_PRICE_LABEL } from "@/lib/stripe/catalog";
 import type { StoreReason } from "@/lib/storeTypes";
 
 export type { StoreReason };
@@ -140,9 +141,17 @@ export default function StoreModal({
               }}
               onPointerDown={(e) => e.stopPropagation()}
               aria-label={user ? "Account" : "Restore purchases"}
-              className="pointer-events-auto absolute top-6 right-6 z-20 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-lg text-neutral-600 ring-1 ring-black/5 transition-colors hover:bg-neutral-200"
+              className="pointer-events-auto absolute top-5 right-5 z-20 flex h-11 w-11 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-neutral-900 transition-opacity hover:opacity-90"
             >
-              👤
+              <Image
+                src={user ? "/logged_in_icon.webp" : "/pre_log_in_icon.webp"}
+                alt=""
+                width={256}
+                height={256}
+                sizes="44px"
+                quality={92}
+                className="h-11 w-11 object-cover"
+              />
             </button>
 
             <div
@@ -256,7 +265,7 @@ export default function StoreModal({
                             className="pointer-events-auto flex-none rounded-full px-3 py-2 text-xs font-semibold text-white transition-colors"
                             style={{ backgroundColor: pack.accentHex }}
                           >
-                            €2.99
+                            {PACK_PRICE_LABEL}
                           </button>
                         )}
                       </div>

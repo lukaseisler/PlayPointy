@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import type { User } from "@supabase/supabase-js";
+import CheckoutConfirmModal from "@/components/CheckoutConfirmModal";
 import LoginModal from "@/components/LoginModal";
 import { FREE_PACK_ID } from "@/lib/data";
 import {
@@ -76,6 +77,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [deckEpoch, setDeckEpoch] = useState(0);
   const [checkoutNotice, setCheckoutNotice] = useState<string | null>(null);
+  const [checkoutConfirm, setCheckoutConfirm] = useState<{
+    packId: string;
+    packName: string;
+  } | null>(null);
 
   const applyOwnedToActive = useCallback(
     (owned: string[], mode: "add" | "allOwned", purchasedPackId?: string) => {
@@ -192,7 +197,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // After Google OAuth (full reload) or email OTP — resume purchase/restore messaging.
+  // After Google OAuth (full reload) or email OTP — resume purchase or restore messaging.
   useEffect(() => {
     if (!authReady || !user) return;
     if (!consumeResumeAfterAuth()) return;
@@ -200,15 +205,51 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     const pending = readPendingCheckout();
     if (pending) {
       const pack = getPackById(pending.packId);
+      if (pack) {
+        setCheckoutConfirm({ packId: pack.id, packName: pack.name });
+        return;
+      }
+    }
+    setCheckoutNotice("Signed in. Your unlocks will appear in All Packs.");
+  }, [authReady, user]);
+
+  // Return from Stripe Checkout.
+  useEffect(() => {
+    if (!authReady || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const checkout = params.get("checkout");
+    if (!checkout) return;
+
+    const packId = params.get("pack_id");
+    params.delete("checkout");
+    params.delete("pack_id");
+    const qs = params.toString();
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}${qs ? `?${qs}` : ""}`,
+    );
+
+    if (checkout === "cancel") {
+      setCheckoutNotice("Checkout canceled. You can try again anytime.");
+      return;
+    }
+    if (checkout !== "success" || !user) return;
+
+    void (async () => {
+      clearPendingCheckout();
+      const { ids, ok } = await refreshEntitlements();
+      if (ok) {
+        applyOwnedToActive(ids, "add", packId ?? undefined);
+      }
+      const pack = packId ? getPackById(packId) : undefined;
       setCheckoutNotice(
         pack
-          ? `Signed in. “${pack.name}” is ready — checkout comes next.`
-          : "Signed in. Your pack is ready — checkout comes next.",
+          ? `Unlocked “${pack.name}”. Have fun.`
+          : "Payment received. Your pack is unlocked.",
       );
-    } else {
-      setCheckoutNotice("Signed in. Your unlocks will appear in All Packs.");
-    }
-  }, [authReady, user]);
+    })();
+  }, [authReady, user, refreshEntitlements, applyOwnedToActive]);
 
   useEffect(() => {
     if (!authReady) return;
@@ -259,16 +300,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     (packId: string, packName: string, reason: StoreReason) => {
       if (packId === FREE_PACK_ID) return;
 
+      savePendingCheckout(packId, reason);
+
       if (user) {
-        // Stripe folgt — Pending behalten, klar kommunizieren.
-        savePendingCheckout(packId, reason);
-        setCheckoutNotice(
-          `You’re signed in. Checkout for “${packName}” isn’t live yet — coming next.`,
-        );
+        setCheckoutConfirm({ packId, packName });
         return;
       }
 
-      savePendingCheckout(packId, reason);
       setLoginError(null);
       setLoginIntent({ packId, packName, reason, mode: "purchase" });
       setLoginOpen(true);
@@ -332,6 +370,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           // Pending behalten bis TTL — User kann erneut tippen.
         }}
         onSignedIn={handleSignedIn}
+      />
+      <CheckoutConfirmModal
+        open={Boolean(checkoutConfirm)}
+        packId={checkoutConfirm?.packId ?? ""}
+        packName={checkoutConfirm?.packName ?? ""}
+        onClose={() => setCheckoutConfirm(null)}
       />
     </AuthContext.Provider>
   );
