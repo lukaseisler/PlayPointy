@@ -140,8 +140,8 @@ export default function GameCard({
 
         {index === 0 && !infoOpen && !isStandalonePwa && (
           <motion.div
-            animate={{ y: [0, -4, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            animate={{ x: [0, -8, 0] }}
+            transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
             className="pointer-events-none absolute right-0 bottom-6 left-0 z-20 mx-auto flex w-fit flex-col items-center gap-1 rounded-2xl bg-black/40 px-4 py-2 text-[13px] font-medium text-white/90 backdrop-blur-md"
           >
             <span>👈 Swipe for next card</span>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LegalHashScroll from "@/components/LegalHashScroll";
 import PhoneFrame from "@/components/PhoneFrame";
 
 /**
@@ -15,6 +16,7 @@ export default function LegalPage({
   return (
     <PhoneFrame>
       <div className="flex h-full flex-col overflow-y-auto bg-white px-6 py-8">
+        <LegalHashScroll />
         <h1 className="text-2xl font-semibold text-neutral-900">{title}</h1>
         <div className="mt-4 flex-1 space-y-3 text-sm leading-relaxed text-neutral-600">
           {children}

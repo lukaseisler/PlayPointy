@@ -210,7 +210,23 @@ export default function StoreModal({
                 const isActive = activePackIds.includes(pack.id);
                 return (
                   <div key={pack.id} className="flex flex-col">
-                    <div className="flex w-full items-center py-2">
+                    <div
+                      role={owned ? undefined : "button"}
+                      tabIndex={owned ? undefined : 0}
+                      onClick={() => {
+                        if (!owned) beginPurchase(pack.id, pack.name, reason);
+                      }}
+                      onKeyDown={(e) => {
+                        if (owned) return;
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          beginPurchase(pack.id, pack.name, reason);
+                        }
+                      }}
+                      className={`flex w-full items-center py-2 ${
+                        owned ? "" : "cursor-pointer"
+                      }`}
+                    >
                       <div
                         className="relative ml-6 aspect-[3/2] w-[145px] flex-none overflow-hidden rounded-xl"
                         style={{ backgroundColor: pack.accentHex }}
@@ -229,7 +245,14 @@ export default function StoreModal({
                         <p className="truncate text-sm font-semibold text-neutral-900">
                           {pack.name}
                         </p>
-                        <p className="text-xs text-neutral-500">{pack.cardCount} Cards</p>
+                        <p className="text-xs text-neutral-500">
+                          {pack.cardCount} Cards
+                        </p>
+                        {!owned ? (
+                          <p className="mt-0.5 text-xs font-medium text-neutral-900 underline underline-offset-2">
+                            See examples
+                          </p>
+                        ) : null}
                       </div>
 
                       <div className="self-center pr-6">
@@ -239,10 +262,14 @@ export default function StoreModal({
                             aria-checked={isActive}
                             aria-label={`${pack.name} ${isActive ? "deactivate" : "activate"}`}
                             tabIndex={0}
-                            onClick={() => toggleActive(pack.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleActive(pack.id);
+                            }}
                             onKeyDown={(e) => {
                               if (e.key === "Enter" || e.key === " ") {
                                 e.preventDefault();
+                                e.stopPropagation();
                                 toggleActive(pack.id);
                               }
                             }}
@@ -261,7 +288,10 @@ export default function StoreModal({
                         ) : (
                           <button
                             type="button"
-                            onClick={() => beginPurchase(pack.id, pack.name, reason)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              beginPurchase(pack.id, pack.name, reason);
+                            }}
                             className="pointer-events-auto flex-none rounded-full px-3 py-2 text-xs font-semibold text-white transition-colors"
                             style={{ backgroundColor: pack.accentHex }}
                           >

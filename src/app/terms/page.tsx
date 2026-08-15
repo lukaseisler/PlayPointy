@@ -9,13 +9,15 @@ export const metadata: Metadata = {
 
 function Section({
   title,
+  id,
   children,
 }: {
   title: string;
+  id?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-2">
+    <section id={id} className="scroll-mt-4 space-y-2">
       <h2 className="text-base font-semibold text-neutral-900">{title}</h2>
       <div className="space-y-2">{children}</div>
     </section>
@@ -90,13 +92,15 @@ export default function TermsPage() {
         <p>
           The subject is the paid provision of digital content (individual card
           packs or bundles) for the browser game &quot;PlayPointy&quot;. The
-          technical steps to conclude a contract are: Selecting a pack or bundle
-          in the store -&gt; Login -&gt; Accepting the GTC and the explicit
-          waiver of withdrawal via respective separate checkboxes -&gt; Clicking
-          the binding payment button (e.g., &quot;Order with obligation to
-          pay&quot; or &quot;Buy now&quot;). The contract is legally concluded
-          the moment you click this payment button, the payment is successful,
-          and we immediately unlock the content in your account.
+          technical steps to conclude a contract are: Selecting a pack in the
+          store -&gt; Sign-in if needed -&gt; Ticking one mandatory, unchecked
+          box (agreement to these GTC, express consent to instant access, and
+          acknowledgement that the 14-day right of withdrawal is lost) -&gt;
+          Tapping the priced button (e.g. &quot;Unlock now · €2.99&quot;) -&gt;
+          Completing payment on Stripe by clicking the binding pay button
+          (obligation to pay). The contract is concluded when that payment
+          button is clicked and payment succeeds. We then unlock the content in
+          your account.
         </p>
       </Section>
 
@@ -109,20 +113,23 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="7. Right of Withdrawal & Explicit Waiver">
+      <Section id="withdrawal" title="7. Right of Withdrawal & Explicit Waiver">
         <p>
           Consumers generally have a statutory right of withdrawal of 14 days.
         </p>
         <p>
-          Exception for digital content: The right of withdrawal expires
-          prematurely if we have begun executing the contract.
+          Exception for digital content (FAGG): The right of withdrawal expires
+          prematurely if we have begun executing the contract with your express
+          consent and you have acknowledged the loss of that right.
         </p>
         <p>
-          By checking the separate, mandatory waiver box during checkout, you
-          explicitly agree to the immediate execution of the contract and
-          acknowledge that you lose your right of withdrawal once the digital
-          content is unlocked. You will receive a confirmation of this contract
-          and your consent via email.
+          By ticking the mandatory, unchecked box before checkout, you agree to
+          these GTC, you expressly agree that we start performing the contract
+          immediately (instant unlock), and you acknowledge that you lose your
+          14-day right of withdrawal once the pack is unlocked. The same waiver
+          is shown again on the Stripe payment page. You receive a payment
+          confirmation (for example via Stripe email) after a successful
+          purchase.
         </p>
       </Section>
 

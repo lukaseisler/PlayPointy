@@ -67,6 +67,13 @@ export async function POST(request: Request) {
       cancel_url: `${site}/?checkout=cancel`,
       client_reference_id: user.id,
       customer_email: user.email ?? undefined,
+      locale: "auto",
+      custom_text: {
+        submit: {
+          message:
+            "By paying you confirm the Terms and that you want instant access. You lose the 14-day right of withdrawal once the pack unlocks.",
+        },
+      },
       metadata: {
         user_id: user.id,
         pack_id: packId,
