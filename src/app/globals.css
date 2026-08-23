@@ -5,6 +5,8 @@
   --foreground: #171717;
   --font-fredoka: "Fredoka", sans-serif;
   --font-oswald: "Oswald", sans-serif;
+  --ios-hole-top: 0px;
+  --ios-hole-h: 100svh;
 }
 
 @theme inline {
@@ -43,6 +45,89 @@ body {
   user-select: none;
   -webkit-touch-callout: none;
   overscroll-behavior: none;
+}
+
+/*
+ * iPhone (nicht PWA, nicht Desktop-Mock): Loch zwischen Safari-Leisten.
+ * CSS gilt sofort über data-ios-safari (Inline-Script im <head>).
+ * JS darf --ios-hole-* danach feiner messen.
+ */
+html[data-ios-safari] {
+  /* Titel (133px, justify-end) sitzt unter der Adresszeile. Unten nur
+     ein schmaler Streifen für die Overlay-Tab-Leiste. */
+  --ios-hole-top: 0px;
+  --ios-hole-h: calc(100lvh - 24px);
+}
+
+@media (min-width: 640px) {
+  html[data-ios-safari] {
+    --ios-hole-top: 0px;
+    --ios-hole-h: 100svh;
+  }
+}
+
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
+  html[data-ios-safari] {
+    --ios-hole-top: 0px;
+    --ios-hole-h: 100svh;
+  }
+}
+
+@media (max-width: 639px) {
+  html[data-ios-safari] .game-surface {
+    container-type: size;
+  }
+
+  /* Restplatz nach oben (unter die Adresszeile), Buttons an die Tab-Leiste. */
+  html[data-ios-safari] .game-card-root {
+    justify-content: flex-end;
+  }
+
+  html[data-ios-safari] .game-card-spacer {
+    display: none;
+  }
+
+  html[data-ios-safari] .game-art {
+    aspect-ratio: auto;
+    height: var(
+      --game-card-h,
+      min(calc(100cqw * 5 / 4), calc(100cqh - 133px - 7.25rem))
+    );
+    overflow: hidden;
+  }
+
+  html[data-ios-safari] .game-art-inner {
+    inset: auto;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: auto;
+    aspect-ratio: 4 / 5;
+  }
+
+  html[data-ios-safari] .game-footer {
+    padding-bottom: 1rem;
+  }
+
+  /* Store deckt den weißen Streifen ab, ohne das Spielfeld zu vergrößern. */
+  html[data-ios-safari][data-store-open] .phone-frame-root,
+  html[data-ios-safari][data-store-open] .game-surface {
+    overflow: visible;
+  }
+
+  html[data-ios-safari] .store-overlay {
+    bottom: calc(var(--ios-hole-h, 100lvh) - 100lvh) !important;
+  }
+}
+
+.store-sheet {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 639px) {
+  html[data-ios-safari] .store-sheet {
+    padding-bottom: 0.5rem;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {

@@ -81,6 +81,12 @@ export default function StoreModal({
     setCatchphrase(pickStoreCatchphrase());
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    document.documentElement.setAttribute("data-store-open", "");
+    return () => document.documentElement.removeAttribute("data-store-open");
+  }, [open]);
+
   function toggleActive(id: string) {
     if (!isOwnedPack(id, unlockedPackIds)) return;
     const isActive = activePackIds.includes(id);
@@ -107,14 +113,14 @@ export default function StoreModal({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="absolute inset-0 z-50 flex flex-col justify-end bg-black/60"
+          className="store-overlay absolute inset-0 z-50 flex flex-col justify-end bg-black/60"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
           <motion.div
-            className="no-scrollbar relative max-h-[85%] overflow-y-auto rounded-t-[2rem] bg-white pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+            className="store-sheet no-scrollbar relative max-h-[85%] overflow-y-auto rounded-t-[2rem] bg-white pt-6"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -223,7 +229,7 @@ export default function StoreModal({
                           beginPurchase(pack.id, pack.name, reason);
                         }
                       }}
-                      className={`flex w-full items-center py-2 ${
+                      className={`flex w-full items-center py-2.5 ${
                         owned ? "" : "cursor-pointer"
                       }`}
                     >
@@ -242,17 +248,13 @@ export default function StoreModal({
                         )}
                       </div>
                       <div className="min-w-0 flex-1 px-4">
-                        <p className="truncate text-sm font-semibold text-neutral-900">
+                        <p className="truncate text-[15px] font-bold text-neutral-900">
                           {pack.name}
                         </p>
-                        <p className="text-xs text-neutral-500">
+                        <p className="mt-0.5 text-[13px] font-medium text-neutral-900">
                           {pack.cardCount} Cards
+                          {!owned ? " · See more" : null}
                         </p>
-                        {!owned ? (
-                          <p className="mt-0.5 text-xs font-medium text-neutral-900 underline underline-offset-2">
-                            See examples
-                          </p>
-                        ) : null}
                       </div>
 
                       <div className="self-center pr-6">
@@ -276,7 +278,7 @@ export default function StoreModal({
                             animate={wiggleControls}
                             className="pointer-events-auto relative h-7 w-12 flex-none cursor-pointer rounded-full transition-colors duration-300"
                             style={{
-                              backgroundColor: isActive ? pack.accentHex : "#d4d4d4",
+                              backgroundColor: isActive ? "#171717" : "#d4d4d4",
                             }}
                           >
                             <motion.span
@@ -292,8 +294,7 @@ export default function StoreModal({
                               e.stopPropagation();
                               beginPurchase(pack.id, pack.name, reason);
                             }}
-                            className="pointer-events-auto flex-none rounded-full px-3 py-2 text-xs font-semibold text-white transition-colors"
-                            style={{ backgroundColor: pack.accentHex }}
+                            className="pointer-events-auto flex-none rounded-full bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-[0_2px_8px_rgba(5,150,105,0.35)] transition-colors hover:bg-emerald-700"
                           >
                             {PACK_PRICE_LABEL}
                           </button>

@@ -30,14 +30,6 @@ export default function CheckoutConfirmModal({
   const [slide, setSlide] = useState(0);
   const examples = getPackExampleCards(packId, 3);
   const cardCount = getPackById(packId)?.cardCount ?? 30;
-  const [badgeDir, setBadgeDir] = useState(1);
-  const current = examples[slide] ?? examples[0];
-  const packAccent = current?.hex || "#171717";
-  const pitches = [
-    "instant fun",
-    "one time purchase",
-    "no subscription",
-  ];
 
   useEffect(() => {
     if (!open) return;
@@ -45,19 +37,16 @@ export default function CheckoutConfirmModal({
     setBusy(false);
     setError(null);
     setSlide(0);
-    setBadgeDir(1);
     setShakeKey(0);
   }, [open, packId]);
 
   function go(delta: number) {
     if (examples.length === 0) return;
-    setBadgeDir(delta > 0 ? 1 : -1);
     setSlide((s) => (s + delta + examples.length) % examples.length);
   }
 
   function goTo(index: number) {
     if (index === slide || examples.length === 0) return;
-    setBadgeDir(index > slide ? 1 : -1);
     setSlide(index);
   }
 
@@ -166,27 +155,6 @@ export default function CheckoutConfirmModal({
             <div className="flex min-h-0 flex-1 flex-col justify-center overflow-visible px-1 pt-1 pb-2">
               {examples.length > 0 ? (
                 <div className="relative">
-                  <div className="mb-3 flex h-7 items-center justify-center overflow-hidden">
-                    <AnimatePresence mode="wait" custom={badgeDir}>
-                      <motion.p
-                        key={`${packId}-${slide}`}
-                        custom={badgeDir}
-                        variants={{
-                          enter: (d: number) => ({ x: d * 28, opacity: 0 }),
-                          center: { x: 0, opacity: 1 },
-                          exit: (d: number) => ({ x: d * -28, opacity: 0 }),
-                        }}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="text-[15px] font-semibold tracking-[0.1em] uppercase"
-                        style={{ color: packAccent }}
-                      >
-                        {pitches[slide % pitches.length]}
-                      </motion.p>
-                    </AnimatePresence>
-                  </div>
                   <motion.div
                     className="relative mx-auto h-[min(46svh,360px)] w-full touch-pan-y overflow-visible [perspective:900px]"
                     drag="x"

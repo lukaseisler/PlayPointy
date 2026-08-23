@@ -62,6 +62,13 @@ export default function RootLayout({
             als Fallback fuer aeltere Clients. */}
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        {/* Sofort, vor React: iPhone (nicht PWA) markieren, damit CSS greift
+            auch wenn Hydration/HMR auf dem Gerät hakt. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var n=navigator,u=n.userAgent||"",ios=/iPhone|iPad|iPod/i.test(u)||(n.platform==="MacIntel"&&n.maxTouchPoints>1);var st=n.standalone===true||window.matchMedia("(display-mode:standalone)").matches;if(ios&&!st)document.documentElement.setAttribute("data-ios-safari","");}catch(e){}})();`,
+          }}
+        />
       </head>
       <body className="font-sans">
         {/* Ausserhalb von PhoneFrame's `overflow-hidden`-Containern gemountet,

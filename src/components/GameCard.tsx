@@ -67,14 +67,11 @@ export default function GameCard({
   }
 
   return (
-    <div className="relative isolate flex h-full w-full flex-col overflow-hidden bg-white">
-      {/* Equal spacers: auf hohen Displays (18:9+) zentriert, auf kurzen kollabiert. */}
-      <div className="min-h-0 flex-1 basis-0" aria-hidden />
-
+    <div className="game-card-root relative isolate flex h-full w-full flex-col overflow-hidden bg-white">
       <div className="relative z-10 flex w-full shrink-0 flex-col">
       {/* Exakte Höhe (nicht min-height): Farbpanel + Buttons bleiben kartenumabhängig
           auf derselben Y-Position. Einzeilige Titel → Block unten, Leerraum oben. */}
-      <div className="box-border flex h-[133px] shrink-0 flex-col justify-end gap-1 overflow-hidden px-6 pt-6 pb-4">
+      <div className="game-title-block box-border flex h-[133px] shrink-0 flex-col justify-end gap-1 overflow-hidden px-6 pt-6 pb-4">
         <span className="shrink-0 truncate text-base leading-none font-semibold tracking-wide text-neutral-700 uppercase">
           Who is more likely to
         </span>
@@ -84,11 +81,14 @@ export default function GameCard({
       </div>
 
       <div
-        className="relative aspect-[4/5] w-full flex-none shrink-0 overflow-visible transition-colors duration-500"
+        className="game-art relative aspect-[4/5] w-full flex-none shrink-0 overflow-visible transition-colors duration-500"
         style={{ backgroundColor: accent }}
       >
-        {/* Bild separat clippen, damit Logo-Fountain über den Rand fliegen darf. */}
-        <div className="absolute inset-0 overflow-hidden">
+        {/* 4:5-Fläche oben andocken; iOS clippt bei Bedarf nur unten. */}
+        <div
+          className="game-art-inner absolute inset-0 overflow-hidden"
+          style={{ backgroundColor: accent }}
+        >
           {card.image ? (
             <Image
               src={`/${card.image}`}
@@ -231,7 +231,7 @@ export default function GameCard({
       </div>
 
       {/* Footer: feste Höhen, Pack-Name eine Zeile — keine Layout-Sprünge pro Karte. */}
-      <div className="flex w-full shrink-0 flex-col gap-3 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="game-footer flex w-full shrink-0 flex-col gap-3 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <span
           className="h-7 truncate text-center font-oswald text-lg leading-7 font-bold tracking-widest uppercase transition-colors duration-500"
           style={{ color: accent }}
@@ -269,7 +269,7 @@ export default function GameCard({
       </div>
       </div>
 
-      <div className="min-h-0 flex-1 basis-0" aria-hidden />
+      <div className="game-card-spacer min-h-0 flex-1 basis-0" aria-hidden />
 
       <AnimatePresence>
         {toast && (

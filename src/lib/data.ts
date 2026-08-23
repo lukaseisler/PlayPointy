@@ -41,11 +41,35 @@ export function getCardsForPacks(packIds: string[]): Card[] {
 }
 
 /**
- * Baut die Pack-Liste für den Store: Name, Kartenanzahl, Akzentfarbe (erste
- * Karte) und Vorschaubild. Ohne `excludePackId` sind ALLE Packs enthalten
- * (inkl. des kostenlosen Starter-Packs) - der Store fungiert jetzt als
- * "Deck Manager" fuer saemtliche Packs, nicht nur als Kaufliste fuer die
- * noch nicht freigeschalteten.
+ * Dedicated All Packs thumbnails (3:2 WebP in /public/store).
+ * Accent matches the source card in the deck.
+ */
+const STORE_PREVIEWS: Record<string, { image: string; accentHex: string }> = {
+  "starter-chaos": {
+    image: "store/starter-chaos.webp",
+    accentHex: "#e11d48",
+  },
+  "dark-evil": {
+    image: "store/dark-evil.webp",
+    accentHex: "#15803d",
+  },
+  "roast-friends": {
+    image: "store/roast-friends.webp",
+    accentHex: "#7c3aed",
+  },
+  "toxic-love": {
+    image: "store/toxic-love.webp",
+    accentHex: "#db2777",
+  },
+  "unhinged-nights": {
+    image: "store/unhinged-nights.webp",
+    accentHex: "#ff7200", // Puke in an Uber? — night-out orange, not navy
+  },
+};
+
+/**
+ * Baut die Pack-Liste für den Store: Name, Kartenanzahl, Akzentfarbe und
+ * Vorschaubild. Dedicated store thumbs if present, else first card.
  */
 export function getStorePacks(excludePackId?: string): PackSummary[] {
   return allPacks
@@ -53,12 +77,13 @@ export function getStorePacks(excludePackId?: string): PackSummary[] {
     .map((p) => {
       const cards = getCardsForPack(p.id);
       const first = cards[0];
+      const custom = STORE_PREVIEWS[p.id];
       return {
         id: p.id,
         name: p.name,
         cardCount: p.cardCount,
-        accentHex: first?.hex ?? "#171717",
-        previewImage: first?.image ?? null,
+        accentHex: custom?.accentHex ?? first?.hex ?? "#171717",
+        previewImage: custom?.image ?? first?.image ?? null,
       };
     });
 }
@@ -187,12 +212,20 @@ export function getPackExampleCards(packId: string, count = 5): Card[] {
 
 /**
  * Bereitet den Kartentext für die Anzeige auf: entfernt Klammerzusätze wie
- * " (Unhinged Nights)" und stellt sicher, dass der Satz IMMER mit einem
- * Großbuchstaben beginnt (die Rohdaten in der Excel-Quelle sind hier
- * uneinheitlich). Die Rohdaten selbst bleiben unverändert.
+ * " (Unhinged Nights)", stellt sicher, dass der Satz mit einem Großbuchstaben
+ * beginnt, und hängt ein fehlendes Fragezeichen an. Die Rohdaten bleiben
+ * unverändert.
  */
 export function displayTitle(text: string): string {
-  const cleaned = text.replace(/\s*\([^)]*\)\s*$/, "").trim();
+  let cleaned = text.replace(/\s*\([^)]*\)\s*$/, "").trim();
+  if (allPacks.length > 0) {
+    const names = allPacks
+      .map((p) => p.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|");
+    cleaned = cleaned.replace(new RegExp(`\\s+(?:${names})\\s*$`, "i"), "").trim();
+  }
   if (!cleaned) return cleaned;
-  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  if (!cleaned.endsWith("?")) cleaned += "?";
+  return cleaned;
 }

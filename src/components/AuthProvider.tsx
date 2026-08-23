@@ -264,7 +264,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       // Nur bei erfolgreichem Fetch auto-aktivieren — sonst kein Wipe bei Ausfall.
       if (ok) applyOwnedToActive(ids, "allOwned");
     })();
-  }, [user?.id, authReady]); // eslint-disable-line react-hooks/exhaustive-deps -- refresh on user change only
+  }, [user?.id, authReady, refreshEntitlements, applyOwnedToActive]);
 
   useEffect(() => {
     if (!user) return;
