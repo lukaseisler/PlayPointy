@@ -5,13 +5,57 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
-async function grantEntitlement(session: Stripe.Checkout.Session) {
-  const userId =
+async function resolveUserId(session: Stripe.Checkout.Session): Promise<string> {
+  const fromMeta =
     session.metadata?.user_id || session.client_reference_id || null;
-  const packId = session.metadata?.pack_id || null;
-  if (!userId || !packId) {
-    throw new Error("Missing user_id or pack_id on checkout session");
+  if (fromMeta) return fromMeta;
+
+  const email = (
+    session.customer_details?.email ||
+    session.customer_email ||
+    ""
+  )
+    .trim()
+    .toLowerCase();
+  if (!email || !email.includes("@")) {
+    throw new Error("Guest checkout missing customer email");
   }
+
+  const admin = createAdminClient();
+  const { data: created, error: createError } = await admin.auth.admin.createUser(
+    {
+      email,
+      email_confirm: true,
+    },
+  );
+  if (created?.user?.id) return created.user.id;
+
+  // Already registered — page through Auth users (fine at current scale).
+  const msg = (createError?.message ?? "").toLowerCase();
+  if (!msg.includes("already") && !msg.includes("registered") && createError) {
+    throw createError;
+  }
+
+  for (let page = 1; page <= 20; page++) {
+    const { data, error } = await admin.auth.admin.listUsers({
+      page,
+      perPage: 200,
+    });
+    if (error) throw error;
+    const found = data.users.find((u) => (u.email ?? "").toLowerCase() === email);
+    if (found?.id) return found.id;
+    if (data.users.length < 200) break;
+  }
+
+  throw new Error(`Could not resolve Supabase user for ${email}`);
+}
+
+async function grantEntitlement(session: Stripe.Checkout.Session) {
+  const packId = session.metadata?.pack_id || null;
+  if (!packId) {
+    throw new Error("Missing pack_id on checkout session");
+  }
+  const userId = await resolveUserId(session);
 
   const paymentIntent =
     typeof session.payment_intent === "string"

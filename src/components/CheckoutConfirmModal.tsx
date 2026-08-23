@@ -15,6 +15,48 @@ interface CheckoutConfirmModalProps {
   onClose: () => void;
 }
 
+/** Split near the midpoint on a word boundary; second half is the teaser blur. */
+function splitTitleForTeaser(title: string): { head: string; tail: string } {
+  const t = title.trim();
+  if (t.length < 8) return { head: t, tail: "" };
+
+  const mid = Math.ceil(t.length / 2);
+  const before = t.lastIndexOf(" ", mid);
+  const after = t.indexOf(" ", mid);
+  let cut = mid;
+  if (before >= Math.floor(t.length * 0.35)) cut = before;
+  else if (after > 0) cut = after;
+
+  return {
+    head: t.slice(0, cut).trimEnd(),
+    tail: t.slice(cut).trimStart(),
+  };
+}
+
+function TeaserCardTitle({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
+  const title = displayTitle(text);
+  const { head, tail } = splitTitleForTeaser(title);
+  return (
+    <p className={className} aria-label={title}>
+      <span>{head}</span>
+      {tail ? (
+        <>
+          {" "}
+          <span className="inline select-none blur-[2.5px]" aria-hidden>
+            {tail}
+          </span>
+        </>
+      ) : null}
+    </p>
+  );
+}
+
 /** Same bottom-sheet size as StoreModal — card peeks above, stay in-game. */
 export default function CheckoutConfirmModal({
   open,
@@ -65,18 +107,17 @@ export default function CheckoutConfirmModal({
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        setError("Please sign in again, then retry checkout.");
-        setBusy(false);
-        return;
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        headers.Authorization = `Bearer ${session.access_token}`;
       }
 
       const res = await fetch("/api/checkout", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
+        headers,
         body: JSON.stringify({
           packId,
           acceptTerms: true,
@@ -262,13 +303,12 @@ export default function CheckoutConfirmModal({
                                 />
                               ) : null}
                             </div>
-                            <p
+                            <TeaserCardTitle
+                              text={card.text}
                               className={`px-2 pb-2.5 pt-1 text-center font-semibold leading-snug text-white line-clamp-2 min-h-[2.5rem] ${
                                 isCenter ? "text-sm opacity-100" : "text-[11px] opacity-70"
                               }`}
-                            >
-                              {displayTitle(card.text)}
-                            </p>
+                            />
                           </div>
                         </motion.div>
                       );
@@ -346,7 +386,7 @@ export default function CheckoutConfirmModal({
                 <p className="mt-2 text-center text-xs text-red-600">{error}</p>
               ) : (
                 <p className="mt-2 text-center text-[11px] text-neutral-400">
-                  Secure checkout · Stripe · VAT included
+                  Secure checkout · Stripe · email for your receipt &amp; restore
                 </p>
               )}
             </div>

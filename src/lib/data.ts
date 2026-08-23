@@ -154,12 +154,12 @@ function hueOf(hex: string): number {
   return hue;
 }
 
-/** Hand-picked punchy + colorful examples per pack (store buy preview). */
+/** Hand-picked longer titles for store buy preview (teaser blur needs room). */
 const PACK_EXAMPLE_CARD_IDS: Record<string, string[]> = {
-  "dark-evil": ["card_044", "card_059", "card_038"],
-  "roast-friends": ["card_076", "card_066", "card_079"],
-  "toxic-love": ["card_120", "card_095", "card_091"],
-  "unhinged-nights": ["card_122", "card_129", "card_130"],
+  "dark-evil": ["card_047", "card_038", "card_032"],
+  "roast-friends": ["card_083", "card_078", "card_072"],
+  "toxic-love": ["card_106", "card_101", "card_102"],
+  "unhinged-nights": ["card_141", "card_130", "card_123"],
 };
 
 /**

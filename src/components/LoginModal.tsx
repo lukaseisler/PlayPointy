@@ -1,18 +1,23 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useKeyboardOverlap } from "@/hooks/useKeyboardOverlap";
+import { getPackById, getPackExampleCards, getStorePacks } from "@/lib/data";
 import { isInAppBrowser } from "@/lib/inAppBrowser";
 import { markResumeAfterAuth } from "@/lib/pendingCheckout";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/publicConfig";
 
-type Step = "choose" | "email" | "otp";
+type Step = "email" | "otp";
 
 interface LoginModalProps {
   open: boolean;
-  contextLabel?: string | null;
+  /** Purchase flow: pack being unlocked. Null = restore. */
+  packId?: string | null;
+  packName?: string | null;
   initialError?: string | null;
   onClose: () => void;
   onSignedIn: () => void;
@@ -44,12 +49,13 @@ function friendlyAuthError(
 
 export default function LoginModal({
   open,
-  contextLabel,
+  packId,
+  packName,
   initialError,
   onClose,
   onSignedIn,
 }: LoginModalProps) {
-  const [step, setStep] = useState<Step>("choose");
+  const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [error, setError] = useState<string | null>(null);
@@ -58,16 +64,56 @@ export default function LoginModal({
   const [inApp, setInApp] = useState(false);
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
+  const sheetHostRef = useRef<HTMLDivElement | null>(null);
+  const otpRowRef = useRef<HTMLDivElement | null>(null);
+  /** Blocks backdrop dismiss after step/layout changes (IG/TikTok ghost taps). */
+  const ignoreBackdropCloseUntil = useRef(0);
+  const keyboardInset = useKeyboardOverlap(sheetHostRef, open);
+  const keyboardOpen = keyboardInset > 80;
+  const prevInsetRef = useRef(0);
+
+  const isUnlock = Boolean(packId);
+  const packSummary = useMemo(() => {
+    if (!packId) return null;
+    return getStorePacks().find((p) => p.id === packId) ?? null;
+  }, [packId]);
+  const packMeta = useMemo(
+    () => (packId ? getPackById(packId) : undefined),
+    [packId],
+  );
+  const previewCards = useMemo(
+    () => (packId ? getPackExampleCards(packId, 3) : []),
+    [packId],
+  );
+  const displayName = packName ?? packMeta?.name ?? "this pack";
+  const accent = packSummary?.accentHex ?? "#e11d48";
+
+  useEffect(() => {
+    if (keyboardInset > 80 && prevInsetRef.current <= 80) {
+      armBackdropGuard(600);
+    }
+    prevInsetRef.current = keyboardInset;
+  }, [keyboardInset]);
+
+  function armBackdropGuard(ms = 500) {
+    ignoreBackdropCloseUntil.current = Date.now() + ms;
+  }
+
+  function requestClose() {
+    if (Date.now() < ignoreBackdropCloseUntil.current) return;
+    onClose();
+  }
 
   useEffect(() => {
     if (!open) return;
-    setStep("choose");
+    setStep("email");
     setEmail("");
     setOtp(Array(OTP_LENGTH).fill(""));
     setError(initialError ?? null);
     setBusy(false);
     setResendIn(0);
     setInApp(isInAppBrowser());
+    armBackdropGuard(600);
   }, [open, initialError]);
 
   useEffect(() => {
@@ -76,17 +122,23 @@ export default function LoginModal({
     return () => window.clearTimeout(t);
   }, [resendIn]);
 
-  useEffect(() => {
-    if (!open || step !== "email") return;
-    const t = window.setTimeout(() => emailInputRef.current?.focus(), 50);
-    return () => window.clearTimeout(t);
-  }, [open, step]);
-
+  // Never autofocus email — keyboard only on tap.
   useEffect(() => {
     if (!open || step !== "otp") return;
-    const t = window.setTimeout(() => otpRefs.current[0]?.focus(), 50);
+    armBackdropGuard(700);
+    if (inApp) return;
+    const t = window.setTimeout(() => otpRefs.current[0]?.focus(), 80);
     return () => window.clearTimeout(t);
-  }, [open, step]);
+  }, [open, step, inApp]);
+
+  useEffect(() => {
+    if (!open || !keyboardOpen) return;
+    const el = step === "otp" ? otpRowRef.current : emailInputRef.current;
+    const t = window.setTimeout(() => {
+      el?.scrollIntoView({ block: "center", inline: "nearest" });
+    }, 50);
+    return () => window.clearTimeout(t);
+  }, [open, step, keyboardOpen, keyboardInset]);
 
   useEffect(() => {
     if (!open) return;
@@ -97,32 +149,11 @@ export default function LoginModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, busy, onClose]);
 
-  async function signInWithGoogle() {
-    setError(null);
+  async function sendOtp() {
     if (!isSupabaseConfigured()) {
       setError("Sign-in is not configured yet.");
       return;
     }
-    if (inApp) {
-      setError("Open in your browser to continue with Google — or use email below.");
-      return;
-    }
-    const supabase = createClient();
-    setBusy(true);
-    const nextPath = `${window.location.pathname}${window.location.search}` || "/";
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
-    markResumeAfterAuth();
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
-    });
-    setBusy(false);
-    if (oauthError) {
-      setError(friendlyAuthError(oauthError, "Google sign-in failed. Try email instead."));
-    }
-  }
-
-  async function sendOtp() {
     setError(null);
     const trimmed = email.trim().toLowerCase();
     if (!trimmed || !trimmed.includes("@")) {
@@ -145,6 +176,7 @@ export default function LoginModal({
       return;
     }
     setEmail(trimmed);
+    armBackdropGuard(700);
     setStep("otp");
     setResendIn(RESEND_COOLDOWN_SEC);
     setOtp(Array(OTP_LENGTH).fill(""));
@@ -204,197 +236,246 @@ export default function LoginModal({
     }
   }
 
+  const sheetTint = isUnlock
+    ? `linear-gradient(180deg, ${accent}18 0%, #ffffff 42%)`
+    : "linear-gradient(180deg, #fff1f2 0%, #ffffff 38%)";
+
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
-          className="absolute inset-0 z-[60] flex items-end justify-center bg-black/60 sm:items-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
+        <div
+          className="absolute inset-0 z-[60] flex flex-col justify-end bg-transparent"
+          onClick={() => requestClose()}
         >
-          <motion.div
+          <div
+            ref={sheetHostRef}
             role="dialog"
             aria-modal="true"
-            aria-label="Sign in"
-            className="w-full max-w-md rounded-t-[2rem] bg-white px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:rounded-[2rem]"
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 24, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 320, damping: 30 }}
+            aria-label={isUnlock ? `Unlock ${displayName}` : "Restore packs"}
+            className="relative flex h-[85%] w-full flex-col overflow-hidden rounded-t-[2rem] bg-white"
+            style={{ backgroundImage: sheetTint }}
             onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
           >
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-semibold text-neutral-900">
-                  {contextLabel ? "Unlock pack" : "Restore purchases"}
-                </h2>
-                {contextLabel ? (
-                  <p className="mt-1 text-sm text-neutral-500">Unlocking {contextLabel}…</p>
-                ) : (
-                  <p className="mt-1 text-sm text-neutral-500">
-                    Log in with Google or email
-                  </p>
-                )}
-              </div>
-              <button
-                type="button"
-                aria-label="Close"
-                onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-600"
-              >
-                ✕
-              </button>
-            </div>
-
-            {inApp && (
-              <div className="mb-4 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-900">
-                Google sign-in often fails inside TikTok/Instagram.{" "}
-                <a
-                  href={typeof window !== "undefined" ? window.location.href : "/"}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-semibold underline"
-                >
-                  Open in browser
-                </a>{" "}
-                or use email.
-              </div>
-            )}
-
-            <p className="mb-4 text-xs text-neutral-500">
-              Use the same sign-in method you purchased with.
-            </p>
-
-            {error && (
-              <p className="mb-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
-                {error}
-              </p>
-            )}
-
-            {step === "choose" && (
-              <div className="flex flex-col gap-3">
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void signInWithGoogle()}
-                  className="w-full rounded-full bg-neutral-900 py-3 text-sm font-semibold text-white disabled:opacity-60"
-                >
-                  Continue with Google
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => {
-                    setError(null);
-                    setStep("email");
-                  }}
-                  className="w-full rounded-full border-2 border-neutral-200 py-3 text-sm font-semibold text-neutral-800"
-                >
-                  Continue with email
-                </button>
-              </div>
-            )}
-
-            {step === "email" && (
-              <form
-                className="flex flex-col gap-3"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void sendOtp();
-                }}
-              >
-                <label className="text-sm font-medium text-neutral-700">
-                  Email
-                  <input
-                    ref={emailInputRef}
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-3 text-base text-neutral-900 outline-none focus:border-neutral-400"
-                    placeholder="you@email.com"
-                  />
-                </label>
-                <button
-                  type="submit"
-                  disabled={busy}
-                  className="w-full rounded-full bg-neutral-900 py-3 text-sm font-semibold text-white disabled:opacity-60"
-                >
-                  {busy ? "Sending…" : "Send code"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep("choose");
-                    setError(null);
-                  }}
-                  className="text-sm font-medium text-neutral-500"
-                >
-                  Back
-                </button>
-              </form>
-            )}
-
-            {step === "otp" && (
-              <div className="flex flex-col gap-3">
-                <p className="text-sm text-neutral-600">
-                  Enter the 6-digit code sent to <span className="font-semibold">{email}</span>
-                </p>
-                <div className="flex justify-between gap-2" onPaste={handleOtpPaste}>
-                  {otp.map((digit, i) => (
-                    <input
-                      key={i}
-                      ref={(el) => {
-                        otpRefs.current[i] = el;
-                      }}
-                      inputMode="numeric"
-                      autoComplete={i === 0 ? "one-time-code" : "off"}
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleOtpChange(i, e.target.value)}
-                      onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                      className="h-12 w-11 rounded-xl border border-neutral-200 text-center text-lg font-semibold text-neutral-900 outline-none focus:border-neutral-400"
-                      disabled={busy}
-                    />
-                  ))}
+            <motion.div
+              className="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto px-6 pt-6"
+              style={{
+                paddingBottom: `max(${keyboardInset + 24}px, env(safe-area-inset-bottom, 0px), 1.5rem)`,
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+            >
+              <div className="mb-5 flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  {isUnlock ? (
+                    <>
+                      <p className="text-xs font-semibold tracking-[0.14em] text-neutral-500 uppercase">
+                        Unlock
+                      </p>
+                      <h2 className="mt-1 text-2xl font-semibold tracking-tight text-neutral-900">
+                        {displayName}
+                      </h2>
+                      {!keyboardOpen && packMeta && (
+                        <p className="mt-1 text-sm text-neutral-500">
+                          {packMeta.cardCount} cards · log in to continue
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">
+                        Already bought packs?
+                      </h2>
+                      {!keyboardOpen && (
+                        <p className="mt-1.5 text-sm text-neutral-500">
+                          Enter the email you used at checkout.
+                        </p>
+                      )}
+                    </>
+                  )}
                 </div>
                 <button
                   type="button"
-                  disabled={busy || resendIn > 0}
-                  onClick={() => void sendOtp()}
-                  className="text-sm font-medium text-neutral-600 disabled:text-neutral-400"
+                  aria-label="Close"
+                  onClick={onClose}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/80 text-neutral-600 ring-1 ring-black/5"
                 >
-                  {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep("email");
-                    setError(null);
-                  }}
-                  className="text-sm font-medium text-neutral-500"
-                >
-                  Change email
+                  ✕
                 </button>
               </div>
-            )}
 
-            <nav className="mt-6 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-neutral-500">
-              <Link href="/privacy" className="underline underline-offset-2">
-                Privacy
-              </Link>
-              <Link href="/terms" className="underline underline-offset-2">
-                Terms
-              </Link>
-              <Link href="/imprint" className="underline underline-offset-2">
-                Imprint
-              </Link>
-            </nav>
-          </motion.div>
-        </motion.div>
+              {!keyboardOpen && !isUnlock && (
+                <div className="mb-5 flex items-center gap-3 rounded-2xl bg-white/70 px-3 py-3 ring-1 ring-rose-100">
+                  <Image
+                    src="/pre_log_in_icon.webp"
+                    alt=""
+                    width={56}
+                    height={56}
+                    className="h-14 w-14 rounded-full object-cover ring-2 ring-white"
+                  />
+                  <p className="text-sm leading-snug text-neutral-600">
+                    We’ll email you a one-time code — no password needed.
+                  </p>
+                </div>
+              )}
+
+              {!keyboardOpen && isUnlock && (
+                <div className="mb-5">
+                  {previewCards.length > 0 ? (
+                    <div className="relative mx-auto h-[7.5rem] w-full max-w-[280px]">
+                      {previewCards.slice(0, 3).map((card, i) => {
+                        const poses = [
+                          "left-2 top-3 -rotate-8",
+                          "left-1/2 top-0 z-10 -translate-x-1/2",
+                          "right-2 top-3 rotate-8",
+                        ];
+                        return (
+                          <div
+                            key={card.id}
+                            className={`absolute h-[6.75rem] w-[5.1rem] overflow-hidden rounded-xl shadow-md ring-1 ring-black/10 ${poses[i]}`}
+                            style={{ backgroundColor: card.hex || accent }}
+                          >
+                            {card.image && (
+                              <Image
+                                src={`/${card.image}`}
+                                alt=""
+                                fill
+                                sizes="82px"
+                                className="object-cover"
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : packSummary?.previewImage ? (
+                    <div
+                      className="relative mx-auto aspect-[3/2] w-full max-w-[240px] overflow-hidden rounded-2xl shadow-md ring-1 ring-black/10"
+                      style={{ backgroundColor: accent }}
+                    >
+                      <Image
+                        src={`/${packSummary.previewImage}`}
+                        alt=""
+                        fill
+                        sizes="240px"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              )}
+
+              {error && (
+                <p
+                  className="mb-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700"
+                  role="alert"
+                >
+                  {error}
+                </p>
+              )}
+
+              {step === "email" && (
+                <form
+                  className="flex flex-col gap-3"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void sendOtp();
+                  }}
+                >
+                  <label className="text-sm font-medium text-neutral-700">
+                    Email
+                    <input
+                      ref={emailInputRef}
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="mt-1 w-full rounded-xl border border-neutral-200 bg-white px-3 py-3 text-base text-neutral-900 outline-none focus:border-neutral-400"
+                      placeholder="you@email.com"
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className="w-full rounded-full bg-neutral-900 py-3.5 text-sm font-semibold text-white disabled:opacity-60"
+                  >
+                    {busy ? "Sending…" : "Send code"}
+                  </button>
+                </form>
+              )}
+
+              {step === "otp" && (
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm text-neutral-600">
+                    Enter the 6-digit code sent to{" "}
+                    <span className="font-semibold">{email}</span>
+                  </p>
+                  <div
+                    ref={otpRowRef}
+                    className="flex justify-between gap-2"
+                    style={{ scrollMarginBottom: 16 }}
+                    onPaste={handleOtpPaste}
+                  >
+                    {otp.map((digit, i) => (
+                      <input
+                        key={i}
+                        ref={(el) => {
+                          otpRefs.current[i] = el;
+                        }}
+                        inputMode="numeric"
+                        autoComplete={i === 0 ? "one-time-code" : "off"}
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => handleOtpChange(i, e.target.value)}
+                        onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                        className="h-12 w-11 rounded-xl border border-neutral-200 bg-white text-center text-lg font-semibold text-neutral-900 outline-none focus:border-neutral-400"
+                        disabled={busy}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    disabled={busy || resendIn > 0}
+                    onClick={() => void sendOtp()}
+                    className="text-sm font-medium text-neutral-600 disabled:text-neutral-400"
+                  >
+                    {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
+                  </button>
+                  {!keyboardOpen && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        armBackdropGuard(500);
+                        setStep("email");
+                        setError(null);
+                      }}
+                      className="text-sm font-medium text-neutral-500"
+                    >
+                      Change email
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {!keyboardOpen && (
+                <nav className="mt-auto flex flex-wrap justify-center gap-x-4 gap-y-1 pt-8 text-xs text-neutral-500">
+                  <Link href="/privacy" className="underline underline-offset-2">
+                    Privacy
+                  </Link>
+                  <Link href="/terms" className="underline underline-offset-2">
+                    Terms
+                  </Link>
+                  <Link href="/imprint" className="underline underline-offset-2">
+                    Imprint
+                  </Link>
+                </nav>
+              )}
+            </motion.div>
+          </div>
+        </div>
       )}
     </AnimatePresence>
   );

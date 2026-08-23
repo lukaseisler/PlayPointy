@@ -13,6 +13,10 @@ type Body = {
   acceptWithdrawalWaiver?: boolean;
 };
 
+/**
+ * Pack preview → Stripe. Logged-in buyers carry user_id; guests leave email
+ * to Stripe Checkout and the webhook attaches the pack by that email.
+ */
 export async function POST(request: Request) {
   let body: Body;
   try {
@@ -37,24 +41,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Pack not for sale" }, { status: 400 });
   }
 
+  let userId: string | null = null;
+  let userEmail: string | null = null;
+
   const authHeader = request.headers.get("authorization") ?? "";
   const token = authHeader.startsWith("Bearer ")
     ? authHeader.slice("Bearer ".length).trim()
     : "";
-  if (!token) {
-    return NextResponse.json({ error: "Sign in required" }, { status: 401 });
-  }
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser(token);
-  if (userError || !user) {
-    return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  if (token) {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser(token);
+    if (!userError && user) {
+      userId = user.id;
+      userEmail = user.email ?? null;
+    }
   }
 
   try {
@@ -65,8 +71,8 @@ export async function POST(request: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${site}/?checkout=success&pack_id=${encodeURIComponent(packId)}`,
       cancel_url: `${site}/?checkout=cancel`,
-      client_reference_id: user.id,
-      customer_email: user.email ?? undefined,
+      ...(userId ? { client_reference_id: userId } : {}),
+      ...(userEmail ? { customer_email: userEmail } : {}),
       locale: "auto",
       custom_text: {
         submit: {
@@ -75,10 +81,11 @@ export async function POST(request: Request) {
         },
       },
       metadata: {
-        user_id: user.id,
+        ...(userId ? { user_id: userId } : {}),
         pack_id: packId,
         accept_terms: "1",
         accept_withdrawal_waiver: "1",
+        guest: userId ? "0" : "1",
       },
     });
 

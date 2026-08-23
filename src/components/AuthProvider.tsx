@@ -234,7 +234,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       setCheckoutNotice("Checkout canceled. You can try again anytime.");
       return;
     }
-    if (checkout !== "success" || !user) return;
+    if (checkout !== "success") return;
+
+    if (!user) {
+      clearPendingCheckout();
+      const pack = packId ? getPackById(packId) : undefined;
+      setCheckoutNotice(
+        pack
+          ? `Payment received for “${pack.name}”. Use Restore with the email from checkout to unlock.`
+          : "Payment received. Use Restore with the email from checkout to unlock.",
+      );
+      return;
+    }
 
     void (async () => {
       clearPendingCheckout();
@@ -301,17 +312,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       if (packId === FREE_PACK_ID) return;
 
       savePendingCheckout(packId, reason);
-
-      if (user) {
-        setCheckoutConfirm({ packId, packName });
-        return;
-      }
-
-      setLoginError(null);
-      setLoginIntent({ packId, packName, reason, mode: "purchase" });
-      setLoginOpen(true);
+      // Pack preview is the buy page — login is only for restore later.
+      setCheckoutConfirm({ packId, packName });
     },
-    [user],
+    [],
   );
 
   const handleSignedIn = useCallback(() => {
@@ -362,7 +366,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       {children}
       <LoginModal
         open={loginOpen}
-        contextLabel={loginIntent?.mode === "purchase" ? loginIntent.packName : null}
+        packId={loginIntent?.mode === "purchase" ? loginIntent.packId : null}
+        packName={loginIntent?.mode === "purchase" ? loginIntent.packName : null}
         initialError={loginError}
         onClose={() => {
           setLoginOpen(false);

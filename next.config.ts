@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
     "10.89.12.*",
     "10.168.49.105",
     "10.168.49.*",
+    "10.31.5.105",
+    "10.31.5.*",
   ],
   // Lokale WebPs direkt ausliefern – vermeidet `/_next/image`-404er auf
   // Cloudflare ohne aktiviertes Cloudflare Images Produkt.
