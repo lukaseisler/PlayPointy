@@ -9,17 +9,27 @@ const nextConfig: NextConfig = {
   // (siehe Server-Log: "Blocked cross-origin request ... from
   // 192.168.178.155"), was genau erklaert, warum jeder App-Code-Fix auf
   // localhost im Test funktionierte, auf dem echten Handy aber nie half.
+  // Die LAN-IP wechselt per DHCP, darum stehen hier ganze private Bereiche
+  // statt einzelner Adressen.
   allowedDevOrigins: [
-    "192.168.178.155",
-    "192.168.178.*",
-    "10.100.73.105",
-    "10.100.73.*",
-    "10.89.12.105",
-    "10.89.12.*",
-    "10.168.49.105",
-    "10.168.49.*",
-    "10.31.5.105",
-    "10.31.5.*",
+    "10.*.*.*",
+    "172.16.*.*",
+    "172.17.*.*",
+    "172.18.*.*",
+    "172.19.*.*",
+    "172.20.*.*",
+    "172.21.*.*",
+    "172.22.*.*",
+    "172.23.*.*",
+    "172.24.*.*",
+    "172.25.*.*",
+    "172.26.*.*",
+    "172.27.*.*",
+    "172.28.*.*",
+    "172.29.*.*",
+    "172.30.*.*",
+    "172.31.*.*",
+    "192.168.*.*",
   ],
   // Lokale WebPs direkt ausliefern – vermeidet `/_next/image`-404er auf
   // Cloudflare ohne aktiviertes Cloudflare Images Produkt.
