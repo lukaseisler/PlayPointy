@@ -197,6 +197,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Legal-Seite mit "?return=login" geschlossen: Login-Sheet wieder oeffnen.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("login") !== "1") return;
+    setLoginIntent({ reason: "manual", mode: "restore" });
+    setLoginOpen(true);
+    params.delete("login");
+    const url = `${window.location.pathname}${params.toString() ? `?${params}` : ""}`;
+    window.history.replaceState({}, "", url);
+  }, []);
+
   // After Google OAuth (full reload) or email OTP — resume purchase or restore messaging.
   useEffect(() => {
     if (!authReady || !user) return;

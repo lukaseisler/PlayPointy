@@ -310,13 +310,13 @@ export default function StoreModal({
             </div>
 
             <nav className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 px-6 text-xs text-neutral-500">
-              <Link href="/terms" className="underline underline-offset-2">
+              <Link href="/terms?return=store" className="underline underline-offset-2">
                 Terms
               </Link>
-              <Link href="/privacy" className="underline underline-offset-2">
+              <Link href="/privacy?return=store" className="underline underline-offset-2">
                 Privacy
               </Link>
-              <Link href="/imprint" className="underline underline-offset-2">
+              <Link href="/imprint?return=store" className="underline underline-offset-2">
                 Imprint
               </Link>
             </nav>

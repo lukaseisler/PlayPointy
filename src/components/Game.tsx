@@ -94,6 +94,18 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
     setIndex(0);
   }, [deckEpoch]);
 
+  // Legal-Seite mit "?return=store" geschlossen: Store wieder aufziehen.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("store") !== "1") return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- URL-Rueckkehr aus Legal
+    setStoreReason("manual");
+    params.delete("store");
+    const url = `${window.location.pathname}${params.toString() ? `?${params}` : ""}`;
+    window.history.replaceState({}, "", url);
+  }, []);
+
   useEffect(() => {
     if (!checkoutNotice) return;
     setToast(checkoutNotice);

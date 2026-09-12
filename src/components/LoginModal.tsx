@@ -462,13 +462,13 @@ export default function LoginModal({
 
               {!keyboardOpen && (
                 <nav className="mt-auto flex flex-wrap justify-center gap-x-4 gap-y-1 pt-8 text-xs text-neutral-500">
-                  <Link href="/privacy" className="underline underline-offset-2">
+                  <Link href="/privacy?return=login" className="underline underline-offset-2">
                     Privacy
                   </Link>
-                  <Link href="/terms" className="underline underline-offset-2">
+                  <Link href="/terms?return=login" className="underline underline-offset-2">
                     Terms
                   </Link>
-                  <Link href="/imprint" className="underline underline-offset-2">
+                  <Link href="/imprint?return=login" className="underline underline-offset-2">
                     Imprint
                   </Link>
                 </nav>
