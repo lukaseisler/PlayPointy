@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useAnimation, useDragControls } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import type { PackSummary } from "@/lib/types";
 import { FREE_PACK_ID } from "@/lib/data";
@@ -61,6 +61,8 @@ export default function StoreModal({
   const wiggleControls = useAnimation();
   const [catchphrase, setCatchphrase] = useState<string>(STORE_CATCHPHRASES[1]);
   const [accountOpen, setAccountOpen] = useState(false);
+  /** All Packs oeffnet auf pointerdown — der restliche click trifft sonst Overlay/Back. */
+  const ignoreCloseUntil = useRef(0);
   const {
     user,
     unlockedPackIds,
@@ -77,9 +79,15 @@ export default function StoreModal({
       setAccountOpen(false);
       return;
     }
+    ignoreCloseUntil.current = Date.now() + 600;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fresh tagline per store open
     setCatchphrase(pickStoreCatchphrase());
   }, [open]);
+
+  function requestClose() {
+    if (Date.now() < ignoreCloseUntil.current) return;
+    onClose();
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -117,7 +125,13 @@ export default function StoreModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          onClickCapture={(e) => {
+            if (Date.now() < ignoreCloseUntil.current) {
+              e.stopPropagation();
+              e.preventDefault();
+            }
+          }}
+          onClick={requestClose}
         >
           <motion.div
             className="store-sheet no-scrollbar relative max-h-[85%] overflow-y-auto rounded-t-[2rem] bg-white pt-6"
@@ -333,7 +347,7 @@ export default function StoreModal({
               )}
               <button
                 type="button"
-                onClick={onClose}
+                onClick={requestClose}
                 className="pointer-events-auto w-full rounded-full py-3 text-sm font-semibold text-neutral-500"
               >
                 Back to Game

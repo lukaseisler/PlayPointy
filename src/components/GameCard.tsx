@@ -248,6 +248,10 @@ export default function GameCard({
               e.stopPropagation();
               onOpenStore();
             }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenStore();
+            }}
             className="pointer-events-auto relative z-50 flex h-full min-w-0 flex-1 cursor-pointer touch-manipulation items-center justify-center rounded-full text-center text-lg font-semibold text-white shadow-sm transition-colors duration-500"
             style={{ backgroundColor: accent }}
           >
