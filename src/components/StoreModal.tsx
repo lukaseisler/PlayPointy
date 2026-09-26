@@ -162,7 +162,7 @@ export default function StoreModal({
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.5 }}
             onDragEnd={(_event, info) => {
-              if (info.offset.y > 100) requestClose();
+              if (info.offset.y > 100) onClose();
             }}
             onClick={(e) => e.stopPropagation()}
           >
