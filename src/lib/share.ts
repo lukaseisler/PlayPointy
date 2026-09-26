@@ -25,10 +25,6 @@ export function buildShareMessage(card: Card): string {
   return `That's so you haha! 😂\n\n🃏 ${cardTextWithoutQuestion(card.text)}:\n${buildShareUrl(card)}`;
 }
 
-/** OG-Vorschau: Title prominent, Domain als Description (kein Kartentext-Doppel). */
-export const OG_SHARE_TITLE = "Party Card Game!";
-export const OG_SHARE_DESCRIPTION = "playpointy.com";
-
 /**
  * Absolute JPEG-URL für Open-Graph / WhatsApp.
  *

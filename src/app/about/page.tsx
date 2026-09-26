@@ -2,7 +2,7 @@ import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import { getStorePacks } from "@/lib/data";
 import { PACK_PRICE_LABEL } from "@/lib/stripe/catalog";
-import { faqJsonLd, PACK_BLURBS, pageMetadata } from "@/lib/seo";
+import { aboutPageJsonLd, faqJsonLd, PACK_BLURBS, pageMetadata } from "@/lib/seo";
 
 const FAQS = [
   {
@@ -30,7 +30,29 @@ const FAQS = [
     answer:
       "Read the card, point at the person in your group, roast them, then swipe to the next card. No host, no setup, no scoreboard.",
   },
+  {
+    question: "What age is PlayPointy for?",
+    answer:
+      "The game is meant for adults. Packs can be spicy or dark. Checkout asks you to confirm you are 18, or 14–17 with a parent’s consent.",
+  },
+  {
+    question: "Does PlayPointy work offline?",
+    answer:
+      "You need a connection to open the game. After that you play on one phone in the room — nobody else downloads anything.",
+  },
+  {
+    question: "How do I restore a purchase?",
+    answer:
+      "Sign in with the same Google or email you used at checkout. Your unlocked packs come back on that account.",
+  },
+  {
+    question: "How do I share a card?",
+    answer:
+      "Tap Send to Friend. Your friend gets a link to that card and can play PlayPointy in the browser.",
+  },
 ];
+
+export const revalidate = 86400;
 
 export const metadata = pageMetadata({
   title: "About",
@@ -45,7 +67,7 @@ export default function AboutPage() {
 
   return (
     <main className="h-full overflow-y-auto bg-white text-neutral-900">
-      <JsonLd data={faqJsonLd(FAQS)} />
+      <JsonLd data={[aboutPageJsonLd(), faqJsonLd(FAQS)]} />
       <div className="mx-auto max-w-xl space-y-10 px-6 py-12">
         <p className="text-sm font-medium tracking-wide text-neutral-500 uppercase">
           Party card game

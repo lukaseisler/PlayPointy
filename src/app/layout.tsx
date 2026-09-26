@@ -37,14 +37,6 @@ export const metadata: Metadata = {
   authors: [{ name: "Lukas Eisler", url: SITE_URL }],
   creator: "Lukas Eisler",
   category: "games",
-  keywords: [
-    "PlayPointy",
-    "Who is more likely to",
-    "party card game",
-    "browser game",
-    "party game with friends",
-    "no download card game",
-  ],
   alternates: { canonical: SITE_URL },
   robots: {
     index: true,

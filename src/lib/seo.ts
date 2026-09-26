@@ -85,7 +85,12 @@ export function websiteJsonLd() {
         "@id": `${SITE_URL}/#organization`,
         name: SITE_NAME,
         url: SITE_URL,
-        logo: `${SITE_URL}/playpointyapplogo.png`,
+        logo: {
+          "@type": "ImageObject",
+          url: `${SITE_URL}/icon-512x512.png`,
+          width: 512,
+          height: 512,
+        },
       },
       {
         "@type": "WebSite",
@@ -105,13 +110,28 @@ export function websiteJsonLd() {
         inLanguage: "en",
         description: SEO_DESCRIPTION,
         offers: {
-          "@type": "Offer",
-          price: "0",
+          "@type": "AggregateOffer",
+          lowPrice: "0",
+          highPrice: "2.99",
           priceCurrency: "EUR",
+          offerCount: 5,
         },
         publisher: { "@id": `${SITE_URL}/#organization` },
       },
     ],
+  };
+}
+
+export function aboutPageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    name: "About PlayPointy",
+    url: `${SITE_URL}/about`,
+    description:
+      "How to play PlayPointy, the free Who is more likely to party card game.",
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    about: { "@id": `${SITE_URL}/#app` },
   };
 }
 

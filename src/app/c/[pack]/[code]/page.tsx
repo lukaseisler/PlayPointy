@@ -11,13 +11,7 @@ import {
   getCardsForPack,
   getStorePacks,
 } from "@/lib/data";
-import {
-  OG_SHARE_DESCRIPTION,
-  OG_SHARE_TITLE,
-  SITE_URL,
-  absoluteOgImageUrl,
-  buildShareUrl,
-} from "@/lib/share";
+import { SITE_URL, absoluteOgImageUrl, buildShareUrl } from "@/lib/share";
 import { shuffle } from "@/lib/shuffle";
 
 export const dynamic = "force-dynamic";
@@ -30,25 +24,26 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
   const { pack, code } = await params;
   const card = getCardByPackAndCode(pack, code);
   if (!card) {
-    return { title: "PlayPointy" };
+    return {
+      title: { absolute: "PlayPointy" },
+      robots: { index: false, follow: true },
+    };
   }
 
-  // Title = Produkt-Hook (größer in WhatsApp), Description = Brand-Domain.
-  const ogTitle = OG_SHARE_TITLE;
-  const ogDescription = OG_SHARE_DESCRIPTION;
   const image = absoluteOgImageUrl(card);
   const url = buildShareUrl(card);
   const question = displayTitle(card.text);
-  const pageTitle = `${question} | PlayPointy`;
+  const ogDescription =
+    "Play this card in PlayPointy, the free Who is more likely to party game.";
 
   return {
     metadataBase: new URL(SITE_URL),
-    title: pageTitle,
-    description: `Who is more likely to: ${question} Play this card in PlayPointy, the free party card game.`,
+    title: { absolute: `${question} | PlayPointy` },
+    description: `Who is more likely to: ${question} ${ogDescription}`,
     alternates: { canonical: url },
-    robots: { index: true, follow: true },
+    robots: { index: false, follow: true },
     openGraph: {
-      title: ogTitle,
+      title: question,
       description: ogDescription,
       url,
       type: "website",
@@ -68,7 +63,7 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
     },
     twitter: {
       card: "summary_large_image",
-      title: ogTitle,
+      title: question,
       description: ogDescription,
       images: image ? [image] : [],
     },

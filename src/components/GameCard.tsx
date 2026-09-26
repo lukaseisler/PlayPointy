@@ -86,9 +86,9 @@ export default function GameCard({
         <span className="shrink-0 truncate text-base leading-none font-semibold tracking-wide text-neutral-700 uppercase">
           Who is more likely to
         </span>
-        <h1 className="line-clamp-2 text-[26px] leading-tight font-semibold text-neutral-900">
+        <p className="line-clamp-2 text-[26px] leading-tight font-semibold text-neutral-900">
           {displayTitle(card.text)}
-        </h1>
+        </p>
       </div>
 
       <div
@@ -218,7 +218,7 @@ export default function GameCard({
                     onPointerDown={(e) => e.stopPropagation()}
                     className="pointer-events-auto rounded-xl bg-white/15 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-white/25"
                   >
-                    About
+                    How to play / About
                   </Link>
                   <Link
                     href="/imprint"

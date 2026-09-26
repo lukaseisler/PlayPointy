@@ -31,9 +31,9 @@ export default function Home() {
 
   return (
     <PhoneFrame>
+      <h1 className="sr-only">PlayPointy – Who is more likely to?</h1>
       <noscript>
         <main className="px-6 py-10">
-          <h1>PlayPointy – Who is more likely to?</h1>
           <p>{SEO_DESCRIPTION}</p>
           <p>
             <a href="/about">How to play PlayPointy</a>
