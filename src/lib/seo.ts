@@ -9,6 +9,14 @@ export const SEO_TITLE =
 export const SEO_DESCRIPTION =
   "Play Who is more likely to with your friends in the browser. No download, no account. Start free with 30 cards, then unlock packs for roasts, nights out, and chaos.";
 
+export const PACK_STORE_HOOKS: Record<string, string> = {
+  "starter-chaos": "Free pack - premium feel.",
+  "dark-evil": "Who is the meanest here?",
+  "roast-friends": "They deserve it!",
+  "toxic-love": "Who sucks romantically?",
+  "unhinged-nights": "Who makes the worst decisions?",
+};
+
 export const PACK_BLURBS: Record<string, string> = {
   "starter-chaos":
     "The free 30-card starter. Warm up the group with classic Who is more likely to questions.",

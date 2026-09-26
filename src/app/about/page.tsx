@@ -43,7 +43,7 @@ const FAQS = [
   {
     question: "How do I restore a purchase?",
     answer:
-      "Sign in with the same Google or email you used at checkout. Your unlocked packs come back on that account.",
+      "Open the store, tap the account icon, and enter the same email you used at checkout. We’ll send a one-time code.",
   },
   {
     question: "How do I share a card?",

@@ -440,7 +440,7 @@ export default function CheckoutConfirmModal({
                 <p className="mt-2 text-center text-xs text-red-600">{error}</p>
               ) : (
                 <p className="mt-2 text-center text-[11px] text-neutral-400 group-data-[short=true]:hidden">
-                  Secure checkout · Stripe · email for your receipt &amp; restore
+                  One-time · stays on this phone · email for receipt &amp; restore
                 </p>
               )}
             </div>

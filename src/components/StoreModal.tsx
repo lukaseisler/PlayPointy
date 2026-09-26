@@ -8,6 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import type { PackSummary } from "@/lib/types";
 import { FREE_PACK_ID } from "@/lib/data";
 import { isOwnedPack } from "@/lib/ownedPacks";
+import { PACK_STORE_HOOKS } from "@/lib/seo";
 import { PACK_PRICE_LABEL } from "@/lib/stripe/catalog";
 import type { StoreReason } from "@/lib/storeTypes";
 import { isStoreCloseBlocked, lockStoreOpen } from "@/lib/storeOpenLock";
@@ -264,7 +265,7 @@ export default function StoreModal({
                       }`}
                     >
                       <div
-                        className="relative ml-6 aspect-[3/2] w-[145px] flex-none overflow-hidden rounded-xl"
+                        className="relative ml-4 aspect-[3/2] w-[min(7.5rem,32%)] shrink-0 overflow-hidden rounded-xl"
                         style={{ backgroundColor: pack.accentHex }}
                       >
                         {pack.previewImage && (
@@ -272,22 +273,24 @@ export default function StoreModal({
                             src={`/${pack.previewImage}`}
                             alt={pack.name}
                             fill
-                            sizes="145px"
+                            sizes="120px"
                             className="h-full w-full object-cover"
                           />
                         )}
                       </div>
-                      <div className="min-w-0 flex-1 px-4">
-                        <p className="truncate text-[15px] font-bold text-neutral-900">
+                      <div className="min-w-0 flex-1 px-3">
+                        <p className="text-[15px] font-bold leading-snug text-pretty text-neutral-900">
                           {pack.name}
                         </p>
+                        <p className="mt-0.5 text-[12px] leading-snug text-neutral-500">
+                          {PACK_STORE_HOOKS[pack.id] ?? `${pack.cardCount} cards`}
+                        </p>
                         <p className="mt-0.5 text-[13px] font-medium text-neutral-900">
-                          {pack.cardCount} Cards
+                          {pack.cardCount} cards
                           {!owned ? " · See more" : null}
                         </p>
                       </div>
-
-                      <div className="self-center pr-6">
+                      <div className="shrink-0 self-center pr-4">
                         {owned ? (
                           <motion.div
                             role="switch"
@@ -324,7 +327,7 @@ export default function StoreModal({
                               e.stopPropagation();
                               beginPurchase(pack.id, pack.name, reason);
                             }}
-                            className="pointer-events-auto flex-none rounded-full bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-[0_2px_8px_rgba(5,150,105,0.35)] transition-colors hover:bg-emerald-700"
+                            className="pointer-events-auto flex-none rounded-full bg-emerald-600 px-3.5 py-2 text-sm font-bold text-white shadow-[0_2px_8px_rgba(5,150,105,0.35)] transition-colors hover:bg-emerald-700"
                           >
                             {PACK_PRICE_LABEL}
                           </button>

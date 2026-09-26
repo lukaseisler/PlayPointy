@@ -58,8 +58,7 @@ export default function PrivacyPage() {
         </p>
         <ul className="list-disc space-y-2 pl-5">
           <li>
-            <strong>Account Data:</strong> Email address and OAuth user
-            identifiers provided by Google, or email address when signing in
+            <strong>Account Data:</strong> Email address when signing in
             with a one-time code, when logging in or creating an account.
           </li>
           <li>
@@ -118,10 +117,7 @@ export default function PrivacyPage() {
         <ul className="list-disc space-y-2 pl-5">
           <li>
             <strong>Supabase:</strong> Backend database and user account
-            authentication (Google sign-in and email one-time codes).
-          </li>
-          <li>
-            <strong>Google:</strong> OAuth identity provider for sign-in.
+            authentication (email one-time codes).
           </li>
           <li>
             <strong>Resend:</strong> Email delivery for one-time sign-in codes
