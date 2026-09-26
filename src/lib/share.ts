@@ -48,33 +48,49 @@ export function absoluteCardImageUrl(card: Card): string | null {
   return absoluteOgImageUrl(card);
 }
 
-export type ShareResult = "shared" | "copied" | "cancelled" | "failed";
+export type ShareResult = "shared" | "cancelled" | "failed";
+
+function canShareData(data: ShareData): boolean {
+  if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
+    return false;
+  }
+  if (typeof navigator.canShare !== "function") return true;
+  try {
+    return navigator.canShare(data);
+  } catch {
+    return false;
+  }
+}
 
 /**
- * Mobile: navigator.share mit voller Message.
- * Desktop / Fallback: Zwischenablage, Caller zeigt Toast bei "copied".
+ * Always open the OS share sheet. Never copy to the clipboard.
+ * Tries a few payloads because iOS/Android reject some combinations.
  */
 export async function shareCard(card: Card): Promise<ShareResult> {
-  const message = buildShareMessage(card);
+  if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
+    return "failed";
+  }
 
-  if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+  const url = buildShareUrl(card);
+  const text = `That's so you haha! 😂\n\n🃏 ${cardTextWithoutQuestion(card.text)}:`;
+  const payloads: ShareData[] = [
+    { text, url },
+    { url },
+    { text: `${text}\n${url}` },
+  ];
+
+  for (const data of payloads) {
+    if (!canShareData(data)) continue;
     try {
-      await navigator.share({ text: message });
+      await navigator.share(data);
       return "shared";
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
         return "cancelled";
       }
-      // Weiter mit Clipboard-Fallback
-    }
-  }
-
-  if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(message);
-      return "copied";
-    } catch {
-      return "failed";
+      if (err instanceof DOMException && err.name === "InvalidStateError") {
+        return "cancelled";
+      }
     }
   }
 

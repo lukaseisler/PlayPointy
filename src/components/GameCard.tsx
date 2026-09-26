@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useAnimation } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CounterLogoBurst from "@/components/CounterLogoBurst";
 import { useIsStandalonePwa } from "@/hooks/useIsStandalonePwa";
 import { displayTitle } from "@/lib/data";
@@ -34,6 +34,7 @@ export default function GameCard({
   const [infoOpen, setInfoOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [burstKey, setBurstKey] = useState(0);
+  const shareLock = useRef(false);
   const isStandalonePwa = useIsStandalonePwa();
   const logoControls = useAnimation();
 
@@ -44,8 +45,17 @@ export default function GameCard({
   }, [toast]);
 
   async function handleShare() {
+    if (shareLock.current) return;
+    shareLock.current = true;
     const result = await shareCard(card);
-    if (result === "copied") setToast("Copied to clipboard");
+    if (result === "failed") {
+      shareLock.current = false;
+      setToast("Couldn't open share menu");
+      return;
+    }
+    window.setTimeout(() => {
+      shareLock.current = false;
+    }, 800);
   }
 
   async function handleLogoBoop(e: React.MouseEvent<HTMLButtonElement>) {
@@ -271,7 +281,12 @@ export default function GameCard({
           <button
             type="button"
             data-no-tap-nav
-            onPointerDownCapture={(e) => {
+            onPointerDownCapture={(e) => e.stopPropagation()}
+            onPointerUp={(e) => {
+              e.stopPropagation();
+              void handleShare();
+            }}
+            onClick={(e) => {
               e.stopPropagation();
               void handleShare();
             }}
