@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { displayTitle, getPackById } from "@/lib/data";
 import { PACK_PRICE_LABEL } from "@/lib/stripe/catalog";
 import { createClient } from "@/lib/supabase/client";
-import { usePackTeaserCards } from "@/lib/teaserCards";
+import { usePackTeaserCards } from "@/lib/usePackTeaserCards";
 
 interface CheckoutConfirmModalProps {
   open: boolean;

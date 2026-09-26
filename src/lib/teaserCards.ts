@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { getCardsForPack } from "@/lib/data";
 import type { Card } from "@/lib/types";
 
@@ -93,23 +92,6 @@ export function getOrCreateTeaserCards(
   const ids = pickFreshIds(packId, count);
   writeStoredIds(packId, ids);
   return resolveCards(packId, ids);
-}
-
-export function usePackTeaserCards(
-  packId: string | null | undefined,
-  count = TEASER_COUNT,
-): Card[] {
-  const [cards, setCards] = useState<Card[]>([]);
-
-  useEffect(() => {
-    if (!packId) {
-      setCards([]);
-      return;
-    }
-    setCards(getOrCreateTeaserCards(packId, count));
-  }, [packId, count]);
-
-  return cards;
 }
 
 export function formatTeaserCardIds(ids: string[]): string {

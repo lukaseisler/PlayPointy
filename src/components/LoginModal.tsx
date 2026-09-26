@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useKeyboardOverlap } from "@/hooks/useKeyboardOverlap";
 import { getPackById, getStorePacks } from "@/lib/data";
-import { usePackTeaserCards } from "@/lib/teaserCards";
+import { usePackTeaserCards } from "@/lib/usePackTeaserCards";
 import { isInAppBrowser } from "@/lib/inAppBrowser";
 import { markResumeAfterAuth } from "@/lib/pendingCheckout";
 import { createClient } from "@/lib/supabase/client";
