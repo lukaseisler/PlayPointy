@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import CounterLogoBurst from "@/components/CounterLogoBurst";
 import { useIsStandalonePwa } from "@/hooks/useIsStandalonePwa";
 import { displayTitle } from "@/lib/data";
-import { shareCard } from "@/lib/share";
+import { absoluteOgImageUrl, buildSharePath, shareCard } from "@/lib/share";
 import { lockStoreOpen } from "@/lib/storeOpenLock";
 import type { Card } from "@/lib/types";
 
@@ -43,6 +43,15 @@ export default function GameCard({
     const t = window.setTimeout(() => setToast(null), 1800);
     return () => window.clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    if (position !== 1) return;
+    void fetch(buildSharePath(card), { credentials: "omit" }).catch(() => {});
+    const og = absoluteOgImageUrl(card);
+    if (!og) return;
+    const img = new window.Image();
+    img.src = og;
+  }, [card, position]);
 
   async function handleShare() {
     if (shareLock.current) return;

@@ -7,6 +7,7 @@ import PhoneFrame from "@/components/PhoneFrame";
 import {
   FREE_PACK_ID,
   displayTitle,
+  getAllCards,
   getCardByPackAndCode,
   getCardsForPack,
   getStorePacks,
@@ -14,7 +15,14 @@ import {
 import { SITE_URL, absoluteOgImageUrl, buildShareUrl } from "@/lib/share";
 import { shuffle } from "@/lib/shuffle";
 
-export const dynamic = "force-dynamic";
+export function generateStaticParams() {
+  return getAllCards().map((card) => ({
+    pack: card.packId,
+    code: card.shareCode,
+  }));
+}
+
+export const dynamicParams = true;
 
 interface SharePageProps {
   params: Promise<{ pack: string; code: string }>;

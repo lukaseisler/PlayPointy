@@ -17,12 +17,11 @@ export function buildShareUrl(card: Card): string {
   return `${SITE_URL}${buildSharePath(card)}`;
 }
 
-/**
- * Share-Nachricht laut Product Spec:
- * "That's so you haha! 😂\n\n🃏 [Kartentext]:\n[LINK]"
- */
+export const SHARE_HOOK = "That's so you haha! 😂";
+
+/** Hook + link only. The card line is the OG preview title, not repeated here. */
 export function buildShareMessage(card: Card): string {
-  return `That's so you haha! 😂\n\n🃏 ${cardTextWithoutQuestion(card.text)}:\n${buildShareUrl(card)}`;
+  return `${SHARE_HOOK}\n${buildShareUrl(card)}`;
 }
 
 /**
@@ -68,11 +67,10 @@ export async function shareCard(card: Card): Promise<ShareResult> {
   }
 
   const url = buildShareUrl(card);
-  const text = `That's so you haha! 😂\n\n🃏 ${cardTextWithoutQuestion(card.text)}:`;
   const payloads: ShareData[] = [
-    { text, url },
+    { text: SHARE_HOOK, url },
     { url },
-    { text: `${text}\n${url}` },
+    { text: `${SHARE_HOOK}\n${url}` },
   ];
 
   for (const data of payloads) {
