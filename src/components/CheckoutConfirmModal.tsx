@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { displayTitle, getPackById } from "@/lib/data";
 import { PACK_PRICE_LABEL } from "@/lib/stripe/catalog";
 import { createClient } from "@/lib/supabase/client";
@@ -49,7 +49,7 @@ function TeaserCardTitle({
       {tail ? (
         <>
           {" "}
-          <span className="inline select-none blur-[2.5px]" aria-hidden>
+          <span className="inline select-none blur-[7px]" aria-hidden>
             {tail}
           </span>
         </>
@@ -73,6 +73,33 @@ export default function CheckoutConfirmModal({
   const [slide, setSlide] = useState(0);
   const examples = usePackTeaserCards(open ? packId : null, 3);
   const cardCount = getPackById(packId)?.cardCount ?? 30;
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [cardWidth, setCardWidth] = useState(176);
+  const [shortSheet, setShortSheet] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const sheet = sheetRef.current;
+    const slot = carouselRef.current;
+
+    const measure = () => {
+      const sheetH = sheet?.clientHeight ?? 0;
+      setShortSheet(sheetH > 0 && sheetH < 620);
+      if (!slot) return;
+      const imageH = Math.max(80, slot.clientHeight - 40);
+      const fromHeight = imageH * 0.75;
+      const fromWidth = slot.clientWidth * 0.52;
+      setCardWidth(
+        Math.round(Math.max(120, Math.min(220, fromHeight, fromWidth))),
+      );
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (sheet) ro.observe(sheet);
+    if (slot) ro.observe(slot);
+    return () => ro.disconnect();
+  }, [open, examples.length]);
 
   useEffect(() => {
     if (!open) return;
@@ -143,17 +170,19 @@ export default function CheckoutConfirmModal({
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="absolute inset-0 z-[60] flex flex-col justify-end bg-transparent"
+          className="absolute inset-0 z-[60] bg-black/60"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
           <motion.div
+            ref={sheetRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="checkout-title"
-            className="relative flex h-[85%] flex-col overflow-hidden rounded-t-[2rem] bg-white"
+            data-short={shortSheet ? "true" : undefined}
+            className="group absolute inset-x-0 bottom-0 top-[15%] flex flex-col overflow-hidden rounded-t-[2rem] bg-white"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -171,7 +200,7 @@ export default function CheckoutConfirmModal({
           >
             <div
               onPointerDown={(e) => dragControls.start(e)}
-              className="touch-none relative shrink-0 cursor-grab px-6 pt-6 pb-1"
+              className="touch-none relative z-20 shrink-0 cursor-grab bg-white px-6 pt-5 pb-2 group-data-[short=true]:pt-3 group-data-[short=true]:pb-1"
             >
               <div className="mx-auto h-1.5 w-10 rounded-full bg-neutral-200" />
               <button
@@ -180,17 +209,17 @@ export default function CheckoutConfirmModal({
                 onClick={onClose}
                 disabled={busy}
                 onPointerDown={(e) => e.stopPropagation()}
-                className="absolute top-5 right-5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-600"
+                className="absolute top-5 right-5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-600 group-data-[short=true]:top-3"
               >
                 ✕
               </button>
               <h2
                 id="checkout-title"
-                className="mt-5 text-center text-3xl font-semibold tracking-tight text-neutral-900"
+                className="mt-5 text-center text-3xl font-semibold tracking-tight text-neutral-900 group-data-[short=true]:mt-3 group-data-[short=true]:text-[1.65rem]"
               >
                 {packName}
               </h2>
-              <p className="mt-1.5 text-center text-[15px] font-bold tracking-[0.14em] text-neutral-900 uppercase">
+              <p className="mt-1.5 text-center text-[15px] font-bold tracking-[0.14em] text-neutral-900 uppercase group-data-[short=true]:mt-1 group-data-[short=true]:text-[13px]">
                 <motion.span
                   key={`${packId}-new-cards`}
                   className="inline-block origin-center will-change-transform"
@@ -209,11 +238,15 @@ export default function CheckoutConfirmModal({
               </p>
             </div>
 
-            <div className="flex min-h-0 flex-1 flex-col justify-center overflow-visible px-1 pt-1 pb-2">
+            <div className="flex min-h-0 flex-1 flex-col px-1 pt-1">
               {examples.length > 0 ? (
-                <div className="relative">
+                <>
+                  <div
+                    ref={carouselRef}
+                    className="relative mx-auto min-h-0 w-full flex-1"
+                  >
                   <motion.div
-                    className="relative mx-auto h-[min(46svh,360px)] w-full touch-pan-y overflow-visible [perspective:900px]"
+                    className="absolute inset-0 touch-pan-y [perspective:900px]"
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={0.18}
@@ -225,7 +258,6 @@ export default function CheckoutConfirmModal({
                     {examples.map((card, i) => {
                       const n = examples.length;
                       const rel = ((i - slide) % n + n) % n;
-                      // Map relative index onto left2 / left / center / right / right2
                       let slot:
                         | "left2"
                         | "left"
@@ -243,30 +275,35 @@ export default function CheckoutConfirmModal({
                       const poses = {
                         left2: {
                           x: "-118%",
+                          y: "-50%",
                           rotate: -18,
                           scale: 0.68,
                           opacity: 0.72,
                         },
                         left: {
                           x: "-84%",
+                          y: "-50%",
                           rotate: -10,
                           scale: 0.82,
                           opacity: 0.9,
                         },
                         center: {
                           x: "-50%",
+                          y: "-50%",
                           rotate: 0,
                           scale: 1,
                           opacity: 1,
                         },
                         right: {
                           x: "-16%",
+                          y: "-50%",
                           rotate: 10,
                           scale: 0.82,
                           opacity: 0.9,
                         },
                         right2: {
                           x: "18%",
+                          y: "-50%",
                           rotate: 18,
                           scale: 0.68,
                           opacity: 0.72,
@@ -283,8 +320,8 @@ export default function CheckoutConfirmModal({
                       return (
                         <motion.div
                           key={card.id}
-                          className="absolute top-0 left-1/2 w-[56%] max-w-[220px] origin-bottom cursor-pointer"
-                          style={{ zIndex: z }}
+                          className="absolute top-1/2 left-1/2 origin-center cursor-pointer"
+                          style={{ zIndex: z, width: cardWidth }}
                           animate={poses[slot]}
                           transition={{
                             type: "spring",
@@ -321,7 +358,7 @@ export default function CheckoutConfirmModal({
                             </div>
                             <TeaserCardTitle
                               text={card.text}
-                              className={`px-2 pb-2.5 pt-1 text-center font-semibold leading-snug text-white line-clamp-2 min-h-[2.5rem] ${
+                              className={`px-2 pb-2 pt-1 text-center font-semibold leading-snug text-white line-clamp-2 min-h-[2.25rem] ${
                                 isCenter ? "text-sm opacity-100" : "text-[11px] opacity-70"
                               }`}
                             />
@@ -330,8 +367,9 @@ export default function CheckoutConfirmModal({
                       );
                     })}
                   </motion.div>
+                  </div>
 
-                  <div className="mt-1 flex justify-center gap-1.5">
+                  <div className="flex shrink-0 justify-center gap-1.5 py-1.5">
                     {examples.map((card, i) => (
                       <button
                         key={card.id}
@@ -346,14 +384,14 @@ export default function CheckoutConfirmModal({
                       />
                     ))}
                   </div>
-                </div>
+                </>
               ) : null}
             </div>
 
-            <div className="shrink-0 border-t border-neutral-100 px-6 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+            <div className="relative z-20 shrink-0 border-t border-neutral-100 bg-white px-6 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] group-data-[short=true]:pt-2 group-data-[short=true]:pb-[max(0.7rem,env(safe-area-inset-bottom))]">
               <motion.div
                 key={shakeKey}
-                className="mb-3 text-xs leading-snug text-neutral-700"
+                className="mb-3 text-xs leading-snug text-neutral-700 group-data-[short=true]:mb-2 group-data-[short=true]:text-[11px]"
                 animate={
                   shakeKey > 0
                     ? { x: [0, -8, 8, -6, 6, -3, 3, 0] }
@@ -393,7 +431,7 @@ export default function CheckoutConfirmModal({
                 type="button"
                 disabled={busy}
                 onClick={() => void startCheckout()}
-                className="w-full rounded-full bg-emerald-600 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60"
+                className="w-full rounded-full bg-emerald-600 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60 group-data-[short=true]:py-3"
               >
                 {busy ? "Redirecting…" : `Unlock now · ${PACK_PRICE_LABEL}`}
               </button>
@@ -401,7 +439,7 @@ export default function CheckoutConfirmModal({
               {error ? (
                 <p className="mt-2 text-center text-xs text-red-600">{error}</p>
               ) : (
-                <p className="mt-2 text-center text-[11px] text-neutral-400">
+                <p className="mt-2 text-center text-[11px] text-neutral-400 group-data-[short=true]:hidden">
                   Secure checkout · Stripe · email for your receipt &amp; restore
                 </p>
               )}

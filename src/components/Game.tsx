@@ -51,6 +51,7 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
     deckEpoch,
     checkoutNotice,
     clearCheckoutNotice,
+    checkoutOpen,
   } = useAuth();
   const initialMountDone = useRef(false);
   const lastDeckEpoch = useRef(0);
@@ -219,7 +220,7 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
       )}
 
       <StoreModal
-        open={storeReason !== null}
+        open={storeReason !== null && !checkoutOpen}
         reason={storeReason ?? "manual"}
         packs={storePacks}
         activePackIds={activePackIds}

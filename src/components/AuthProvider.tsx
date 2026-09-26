@@ -51,6 +51,7 @@ interface AuthContextValue {
   signOut: () => Promise<void>;
   openRestoreLogin: () => void;
   beginPurchase: (packId: string, packName: string, reason: StoreReason) => void;
+  checkoutOpen: boolean;
   /** Nach Login/Restore: Parent soll Deck neu bauen. */
   deckEpoch: number;
   checkoutNotice: string | null;
@@ -352,6 +353,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       openRestoreLogin,
       beginPurchase,
+      checkoutOpen: Boolean(checkoutConfirm),
       deckEpoch,
       checkoutNotice,
       clearCheckoutNotice,
@@ -367,6 +369,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       openRestoreLogin,
       beginPurchase,
+      checkoutConfirm,
       deckEpoch,
       checkoutNotice,
       clearCheckoutNotice,
