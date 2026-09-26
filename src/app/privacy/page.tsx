@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
 import LegalPage from "@/components/LegalPage";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy – PlayPointy",
-  description: "Privacy policy for PlayPointy.",
-};
+export const metadata = pageMetadata({
+  title: "Privacy Policy",
+  description:
+    "How PlayPointy handles accounts, purchases, and game data.",
+  path: "/privacy",
+});
 
 function Section({
   title,

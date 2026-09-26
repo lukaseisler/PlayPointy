@@ -38,12 +38,15 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
   const ogDescription = OG_SHARE_DESCRIPTION;
   const image = absoluteOgImageUrl(card);
   const url = buildShareUrl(card);
-  const pageTitle = `${displayTitle(card.text)} | PlayPointy`;
+  const question = displayTitle(card.text);
+  const pageTitle = `${question} | PlayPointy`;
 
   return {
     metadataBase: new URL(SITE_URL),
     title: pageTitle,
-    description: ogDescription,
+    description: `Who is more likely to: ${question} Play this card in PlayPointy, the free party card game.`,
+    alternates: { canonical: url },
+    robots: { index: true, follow: true },
     openGraph: {
       title: ogTitle,
       description: ogDescription,

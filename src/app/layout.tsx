@@ -1,6 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Fredoka, Oswald } from "next/font/google";
 import DebugErrorOverlay from "@/components/DebugErrorOverlay";
+import JsonLd from "@/components/JsonLd";
+import {
+  SEO_DESCRIPTION,
+  SEO_TITLE,
+  SITE_NAME,
+  SITE_URL,
+  websiteJsonLd,
+} from "@/lib/seo";
 import "./globals.css";
 
 const fredoka = Fredoka({
@@ -19,9 +27,43 @@ const oswald = Oswald({
 });
 
 export const metadata: Metadata = {
-  title: "PlayPointy - Who is more likely to...",
-  description:
-    "The ultimate party card game for your group. No download, no account – just play.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SEO_TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SEO_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: "Lukas Eisler", url: SITE_URL }],
+  creator: "Lukas Eisler",
+  category: "games",
+  keywords: [
+    "PlayPointy",
+    "Who is more likely to",
+    "party card game",
+    "browser game",
+    "party game with friends",
+    "no download card game",
+  ],
+  alternates: { canonical: SITE_URL },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SEO_TITLE,
+    description: SEO_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SEO_TITLE,
+    description: SEO_DESCRIPTION,
+  },
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -33,7 +75,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "Play Pointy",
+    title: SITE_NAME,
     statusBarStyle: "default",
   },
 };
@@ -74,6 +116,7 @@ export default function RootLayout({
         {/* Ausserhalb von PhoneFrame's `overflow-hidden`-Containern gemountet,
             damit die Fehlerbox garantiert sichtbar ist - auch wenn irgendwo
             tiefer im Baum etwas haengt/abstuerzt. */}
+        <JsonLd data={websiteJsonLd()} />
         <DebugErrorOverlay />
         {children}
       </body>

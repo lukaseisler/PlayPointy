@@ -1,7 +1,10 @@
 {
   "name": "PlayPointy",
   "short_name": "Play Pointy",
+  "description": "Who is more likely to? Free party card game in your browser.",
   "start_url": "/",
+  "categories": ["games", "entertainment"],
+  "lang": "en",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#171717",

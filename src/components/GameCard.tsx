@@ -204,6 +204,13 @@ export default function GameCard({
                 <p className="pr-8 text-sm font-medium text-white/80">Legal</p>
                 <nav className="mt-4 flex flex-col gap-2">
                   <Link
+                    href="/about"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    className="pointer-events-auto rounded-xl bg-white/15 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-white/25"
+                  >
+                    About
+                  </Link>
+                  <Link
                     href="/imprint"
                     onPointerDown={(e) => e.stopPropagation()}
                     className="pointer-events-auto rounded-xl bg-white/15 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-white/25"

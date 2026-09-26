@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
 import LegalPage from "@/components/LegalPage";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Imprint – PlayPointy",
-  description: "Legal imprint for PlayPointy.",
-};
+export const metadata = pageMetadata({
+  title: "Imprint",
+  description: "Legal imprint and contact details for PlayPointy.",
+  path: "/imprint",
+});
 
 export default function ImprintPage() {
   return (

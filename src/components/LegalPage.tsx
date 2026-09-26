@@ -35,6 +35,12 @@ export default function LegalPage({
         >
           Back to Game
         </Link>
+        <Link
+          href="/about"
+          className="mt-3 block text-center text-sm text-neutral-500 underline underline-offset-2"
+        >
+          About PlayPointy
+        </Link>
       </div>
     </PhoneFrame>
   );

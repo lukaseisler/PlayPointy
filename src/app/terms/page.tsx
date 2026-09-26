@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms & Conditions – PlayPointy",
-  description: "Terms and conditions for PlayPointy.",
-};
+export const metadata = pageMetadata({
+  title: "Terms & Conditions",
+  description:
+    "Terms and conditions for playing PlayPointy and unlocking card packs.",
+  path: "/terms",
+});
 
 function Section({
   title,
