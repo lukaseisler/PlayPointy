@@ -10,6 +10,7 @@ import { FREE_PACK_ID } from "@/lib/data";
 import { isOwnedPack } from "@/lib/ownedPacks";
 import { PACK_PRICE_LABEL } from "@/lib/stripe/catalog";
 import type { StoreReason } from "@/lib/storeTypes";
+import { isStoreCloseBlocked, lockStoreOpen } from "@/lib/storeOpenLock";
 
 export type { StoreReason };
 
@@ -61,8 +62,14 @@ export default function StoreModal({
   const wiggleControls = useAnimation();
   const [catchphrase, setCatchphrase] = useState<string>(STORE_CATCHPHRASES[1]);
   const [accountOpen, setAccountOpen] = useState(false);
-  /** All Packs oeffnet auf pointerdown — der restliche click trifft sonst Overlay/Back. */
-  const ignoreCloseUntil = useRef(0);
+  const wasOpen = useRef(false);
+  if (open && !wasOpen.current) {
+    lockStoreOpen();
+    wasOpen.current = true;
+  }
+  if (!open) {
+    wasOpen.current = false;
+  }
   const {
     user,
     unlockedPackIds,
@@ -79,13 +86,12 @@ export default function StoreModal({
       setAccountOpen(false);
       return;
     }
-    ignoreCloseUntil.current = Date.now() + 600;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fresh tagline per store open
     setCatchphrase(pickStoreCatchphrase());
   }, [open]);
 
   function requestClose() {
-    if (Date.now() < ignoreCloseUntil.current) return;
+    if (isStoreCloseBlocked()) return;
     onClose();
   }
 
@@ -126,12 +132,22 @@ export default function StoreModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClickCapture={(e) => {
-            if (Date.now() < ignoreCloseUntil.current) {
+            if (e.target !== e.currentTarget) return;
+            if (isStoreCloseBlocked()) {
               e.stopPropagation();
               e.preventDefault();
             }
           }}
-          onClick={requestClose}
+          onPointerUpCapture={(e) => {
+            if (e.target !== e.currentTarget) return;
+            if (isStoreCloseBlocked()) {
+              e.stopPropagation();
+              e.preventDefault();
+            }
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) requestClose();
+          }}
         >
           <motion.div
             className="store-sheet no-scrollbar relative max-h-[85%] overflow-y-auto rounded-t-[2rem] bg-white pt-6"
@@ -146,7 +162,7 @@ export default function StoreModal({
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.5 }}
             onDragEnd={(_event, info) => {
-              if (info.offset.y > 100) onClose();
+              if (info.offset.y > 100) requestClose();
             }}
             onClick={(e) => e.stopPropagation()}
           >

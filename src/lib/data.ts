@@ -71,6 +71,10 @@ const STORE_PREVIEWS: Record<string, { image: string; accentHex: string }> = {
  * Baut die Pack-Liste für den Store: Name, Kartenanzahl, Akzentfarbe und
  * Vorschaubild. Dedicated store thumbs if present, else first card.
  */
+export function getStorePreviewPath(packId: string): string | null {
+  return STORE_PREVIEWS[packId]?.image ?? null;
+}
+
 export function getStorePacks(excludePackId?: string): PackSummary[] {
   return allPacks
     .filter((p) => p.id !== excludePackId)
@@ -88,127 +92,6 @@ export function getStorePacks(excludePackId?: string): PackSummary[] {
     });
 }
 
-/**
- * Score pack card backgrounds for store previews: prefer saturated, bright
- * colors; downrank muddy browns, dark navy, and grey.
- */
-function vibrancyScore(hex: string): number {
-  const raw = hex.replace("#", "").trim();
-  const full =
-    raw.length === 3
-      ? raw
-          .split("")
-          .map((c) => c + c)
-          .join("")
-      : raw;
-  if (full.length !== 6) return 0;
-  const n = Number.parseInt(full, 16);
-  if (Number.isNaN(n)) return 0;
-  const r = ((n >> 16) & 255) / 255;
-  const g = ((n >> 8) & 255) / 255;
-  const b = (n & 255) / 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const d = max - min;
-  const sat = max === 0 ? 0 : d / max;
-  let hue = 0;
-  if (d > 0) {
-    if (max === r) hue = ((g - b) / d) % 6;
-    else if (max === g) hue = (b - r) / d + 2;
-    else hue = (r - g) / d + 4;
-    hue *= 60;
-    if (hue < 0) hue += 360;
-  }
-  // Muddy olive / brown / khaki band
-  const muddy =
-    hue >= 20 && hue <= 55 && sat < 0.88 && max < 0.78;
-  if (muddy || max < 0.38 || sat < 0.42) return sat * max * 0.15;
-  return sat * max;
-}
-
-function hueOf(hex: string): number {
-  const raw = hex.replace("#", "").trim();
-  const full =
-    raw.length === 3
-      ? raw
-          .split("")
-          .map((c) => c + c)
-          .join("")
-      : raw;
-  if (full.length !== 6) return 0;
-  const n = Number.parseInt(full, 16);
-  if (Number.isNaN(n)) return 0;
-  const r = ((n >> 16) & 255) / 255;
-  const g = ((n >> 8) & 255) / 255;
-  const b = (n & 255) / 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const d = max - min;
-  if (d === 0) return 0;
-  let hue = 0;
-  if (max === r) hue = ((g - b) / d) % 6;
-  else if (max === g) hue = (b - r) / d + 2;
-  else hue = (r - g) / d + 4;
-  hue *= 60;
-  if (hue < 0) hue += 360;
-  return hue;
-}
-
-/** Hand-picked longer titles for store buy preview (teaser blur needs room). */
-const PACK_EXAMPLE_CARD_IDS: Record<string, string[]> = {
-  "dark-evil": ["card_047", "card_038", "card_032"],
-  "roast-friends": ["card_083", "card_078", "card_072"],
-  "toxic-love": ["card_106", "card_101", "card_102"],
-  "unhinged-nights": ["card_141", "card_130", "card_123"],
-};
-
-/**
- * Liefert bis zu `count` Beispielkarten für Store-Preview:
- * kuratierte Favoriten, sonst die knalligsten Farben (ohne matschiges Braun).
- */
-export function getPackExampleCards(packId: string, count = 5): Card[] {
-  const byId = new Map(allCards.map((c) => [c.id, c]));
-  const curated = (PACK_EXAMPLE_CARD_IDS[packId] ?? [])
-    .map((id) => byId.get(id))
-    .filter((c): c is Card => Boolean(c?.image))
-    .slice(0, count);
-  if (curated.length >= count) return curated;
-
-  const pool = getCardsForPack(packId).filter((c) => Boolean(c.image));
-  if (pool.length === 0) return getCardsForPack(packId).slice(0, count);
-
-  const ranked = [...pool].sort(
-    (a, b) => vibrancyScore(b.hex) - vibrancyScore(a.hex),
-  );
-  const picked: Card[] = [...curated];
-  const seen = new Set(picked.map((c) => c.id));
-  const usedHues: number[] = picked.map((c) => hueOf(c.hex));
-
-  for (const card of ranked) {
-    if (picked.length >= count) break;
-    if (seen.has(card.id)) continue;
-    if (vibrancyScore(card.hex) < 0.35) continue;
-    const hue = hueOf(card.hex);
-    const tooClose = usedHues.some((h) => {
-      const d = Math.min(Math.abs(h - hue), 360 - Math.abs(h - hue));
-      return d < 28;
-    });
-    if (tooClose && picked.length >= Math.min(2, count)) continue;
-    picked.push(card);
-    seen.add(card.id);
-    usedHues.push(hue);
-  }
-
-  // Fill remaining if hue filter was too strict
-  for (const card of ranked) {
-    if (picked.length >= count) break;
-    if (seen.has(card.id)) continue;
-    picked.push(card);
-    seen.add(card.id);
-  }
-
-  return picked.slice(0, count);
-}
 
 /**
  * Bereitet den Kartentext für die Anzeige auf: entfernt Klammerzusätze wie

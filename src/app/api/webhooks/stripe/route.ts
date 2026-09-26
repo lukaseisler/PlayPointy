@@ -62,17 +62,33 @@ async function grantEntitlement(session: Stripe.Checkout.Session) {
       ? session.payment_intent
       : (session.payment_intent?.id ?? null);
 
+  const teaserCards = session.metadata?.teaser_cards?.trim() || null;
   const admin = createAdminClient();
-  const { error } = await admin.from("entitlements").upsert(
-    {
-      user_id: userId,
-      pack_id: packId,
-      stripe_session_id: session.id,
-      stripe_payment_intent_id: paymentIntent,
-    },
-    { onConflict: "user_id,pack_id" },
-  );
-  if (error) throw error;
+  const baseRow = {
+    user_id: userId,
+    pack_id: packId,
+    stripe_session_id: session.id,
+    stripe_payment_intent_id: paymentIntent,
+  };
+  const row = teaserCards
+    ? { ...baseRow, teaser_card_ids: teaserCards }
+    : baseRow;
+
+  const { error } = await admin.from("entitlements").upsert(row, {
+    onConflict: "user_id,pack_id",
+  });
+  if (error) {
+    const msg = (error.message ?? "").toLowerCase();
+    const missingCol =
+      msg.includes("teaser_card_ids") ||
+      msg.includes("schema cache") ||
+      msg.includes("could not find");
+    if (!missingCol) throw error;
+    const { error: retryError } = await admin
+      .from("entitlements")
+      .upsert(baseRow, { onConflict: "user_id,pack_id" });
+    if (retryError) throw retryError;
+  }
 }
 
 export async function POST(request: Request) {

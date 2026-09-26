@@ -21,3 +21,9 @@ export function getSiteUrl(): string {
     "https://playpointy.com"
   );
 }
+
+/** Stripe holt Bilder selbst — localhost ist von dort nicht erreichbar. */
+export function getStripeAssetOrigin(): string {
+  const site = getSiteUrl();
+  return /^https:\/\//i.test(site) ? site : "https://playpointy.com";
+}

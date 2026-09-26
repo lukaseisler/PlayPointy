@@ -8,6 +8,7 @@ import CounterLogoBurst from "@/components/CounterLogoBurst";
 import { useIsStandalonePwa } from "@/hooks/useIsStandalonePwa";
 import { displayTitle } from "@/lib/data";
 import { shareCard } from "@/lib/share";
+import { lockStoreOpen } from "@/lib/storeOpenLock";
 import type { Card } from "@/lib/types";
 
 interface GameCardProps {
@@ -246,10 +247,13 @@ export default function GameCard({
             // Framer-Drag oft unterdrückt / verzögert.
             onPointerDownCapture={(e) => {
               e.stopPropagation();
+              lockStoreOpen(e.pointerId);
               onOpenStore();
             }}
+            onPointerUp={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
+              lockStoreOpen();
               onOpenStore();
             }}
             className="pointer-events-auto relative z-50 flex h-full min-w-0 flex-1 cursor-pointer touch-manipulation items-center justify-center rounded-full text-center text-lg font-semibold text-white shadow-sm transition-colors duration-500"

@@ -11,6 +11,7 @@ import { usePwaInstallEligibility } from "@/hooks/usePwaInstallEligibility";
 import { readActivePackIds, writeActivePackIds } from "@/lib/activePacks";
 import { FREE_PACK_ID, getCardsForPacks } from "@/lib/data";
 import { shuffle } from "@/lib/shuffle";
+import { ensureStorePointerTracking, lockStoreOpen } from "@/lib/storeOpenLock";
 import type { Card, PackSummary } from "@/lib/types";
 
 interface GameProps {
@@ -55,6 +56,10 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
   const lastDeckEpoch = useRef(0);
   /** Toggle im Store: neues Deck erst beim nächsten Kartenwechsel. */
   const pendingToggleRebuild = useRef(false);
+
+  if (typeof window !== "undefined") {
+    ensureStorePointerTracking();
+  }
 
   // Gäste / SSR: activePacks vor Paint. Session-User: auf Entitlements warten.
   useLayoutEffect(() => {
@@ -201,7 +206,10 @@ export default function Game({ initialCards, storePacks, featuredCard = null }: 
             position={i + 1}
             index={i}
             total={totalAcrossAllPacks}
-            onOpenStore={() => setStoreReason("manual")}
+            onOpenStore={() => {
+              lockStoreOpen();
+              setStoreReason("manual");
+            }}
           />
         )}
       />

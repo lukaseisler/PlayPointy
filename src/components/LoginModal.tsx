@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useKeyboardOverlap } from "@/hooks/useKeyboardOverlap";
-import { getPackById, getPackExampleCards, getStorePacks } from "@/lib/data";
+import { getPackById, getStorePacks } from "@/lib/data";
+import { usePackTeaserCards } from "@/lib/teaserCards";
 import { isInAppBrowser } from "@/lib/inAppBrowser";
 import { markResumeAfterAuth } from "@/lib/pendingCheckout";
 import { createClient } from "@/lib/supabase/client";
@@ -41,7 +42,9 @@ function friendlyAuthError(
     return "Invalid or expired code. Try again.";
   }
   const msg = (error.message ?? "").trim();
-  if (!msg || msg === "{}" || /smtp|resend|fetch failed|network/i.test(msg)) {
+  // Netzwerk-/DNS-Fehler heissen je nach Browser "Failed to fetch",
+  // "fetch failed" oder "Load failed" - nie roh anzeigen.
+  if (!msg || msg === "{}" || /smtp|resend|fetch|network|load failed/i.test(msg)) {
     return fallback;
   }
   return msg;
@@ -81,10 +84,7 @@ export default function LoginModal({
     () => (packId ? getPackById(packId) : undefined),
     [packId],
   );
-  const previewCards = useMemo(
-    () => (packId ? getPackExampleCards(packId, 3) : []),
-    [packId],
-  );
+  const previewCards = usePackTeaserCards(open && packId ? packId : null, 3);
   const displayName = packName ?? packMeta?.name ?? "this pack";
   const accent = packSummary?.accentHex ?? "#e11d48";
 

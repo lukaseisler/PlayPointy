@@ -4,9 +4,10 @@ import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { displayTitle, getPackById, getPackExampleCards } from "@/lib/data";
+import { displayTitle, getPackById } from "@/lib/data";
 import { PACK_PRICE_LABEL } from "@/lib/stripe/catalog";
 import { createClient } from "@/lib/supabase/client";
+import { usePackTeaserCards } from "@/lib/teaserCards";
 
 interface CheckoutConfirmModalProps {
   open: boolean;
@@ -70,7 +71,7 @@ export default function CheckoutConfirmModal({
   const [error, setError] = useState<string | null>(null);
   const [shakeKey, setShakeKey] = useState(0);
   const [slide, setSlide] = useState(0);
-  const examples = getPackExampleCards(packId, 3);
+  const examples = usePackTeaserCards(open ? packId : null, 3);
   const cardCount = getPackById(packId)?.cardCount ?? 30;
 
   useEffect(() => {
@@ -122,6 +123,7 @@ export default function CheckoutConfirmModal({
           packId,
           acceptTerms: true,
           acceptWithdrawalWaiver: true,
+          teaserCardIds: examples.map((card) => card.id),
         }),
       });
       const data = (await res.json()) as { url?: string; error?: string };
@@ -189,7 +191,21 @@ export default function CheckoutConfirmModal({
                 {packName}
               </h2>
               <p className="mt-1.5 text-center text-[15px] font-bold tracking-[0.14em] text-neutral-900 uppercase">
-                {cardCount} new cards
+                <motion.span
+                  key={`${packId}-new-cards`}
+                  className="inline-block origin-center will-change-transform"
+                  initial={{ scale: 0.84 }}
+                  animate={{ scale: 1 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 160,
+                    damping: 12,
+                    mass: 1.15,
+                    delay: 0.5,
+                  }}
+                >
+                  {cardCount} new cards
+                </motion.span>
               </p>
             </div>
 

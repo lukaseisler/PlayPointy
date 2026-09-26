@@ -1,9 +1,13 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { FREE_PACK_ID } from "@/lib/data";
+import { FREE_PACK_ID, getPackById, getStorePreviewPath } from "@/lib/data";
 import { getStripePriceId } from "@/lib/stripe/catalog";
-import { getSiteUrl, getStripe } from "@/lib/stripe/server";
+import { getSiteUrl, getStripe, getStripeAssetOrigin } from "@/lib/stripe/server";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase/publicConfig";
+import {
+  formatTeaserCardIds,
+  sanitizeTeaserCardIds,
+} from "@/lib/teaserCards";
 
 export const runtime = "nodejs";
 
@@ -11,6 +15,7 @@ type Body = {
   packId?: string;
   acceptTerms?: boolean;
   acceptWithdrawalWaiver?: boolean;
+  teaserCardIds?: unknown;
 };
 
 /**
@@ -66,6 +71,21 @@ export async function POST(request: Request) {
   try {
     const stripe = getStripe();
     const site = getSiteUrl();
+    const assetOrigin = getStripeAssetOrigin();
+    const pack = getPackById(packId);
+    const previewPath = getStorePreviewPath(packId);
+    const previewUrl = previewPath ? `${assetOrigin}/${previewPath}` : null;
+
+    const teaserCardIds = sanitizeTeaserCardIds(packId, body.teaserCardIds);
+
+    const price = await stripe.prices.retrieve(priceId);
+    const productId = typeof price.product === "string" ? price.product : price.product.id;
+    await stripe.products.update(productId, {
+      ...(pack?.name ? { name: pack.name } : {}),
+      ...(pack ? { description: `${pack.cardCount} cards` } : {}),
+      ...(previewUrl ? { images: [previewUrl] } : {}),
+    });
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
@@ -74,6 +94,16 @@ export async function POST(request: Request) {
       ...(userId ? { client_reference_id: userId } : {}),
       ...(userEmail ? { customer_email: userEmail } : {}),
       locale: "auto",
+      // stripe@22 types omit branding_settings; Checkout API accepts it.
+      ...({
+        branding_settings: {
+          display_name: "PlayPointy",
+          logo: {
+            type: "url",
+            url: `${assetOrigin}/playpointyapplogo.png`,
+          },
+        },
+      } as object),
       custom_text: {
         submit: {
           message:
@@ -86,6 +116,9 @@ export async function POST(request: Request) {
         accept_terms: "1",
         accept_withdrawal_waiver: "1",
         guest: userId ? "0" : "1",
+        ...(teaserCardIds
+          ? { teaser_cards: formatTeaserCardIds(teaserCardIds) }
+          : {}),
       },
     });
 
