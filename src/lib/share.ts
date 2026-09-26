@@ -67,10 +67,12 @@ export async function shareCard(card: Card): Promise<ShareResult> {
   }
 
   const url = buildShareUrl(card);
+  // Keep the URL inside `text` only. Passing a separate `url` makes WhatsApp
+  // insert the OG card title between the hook and the link.
   const payloads: ShareData[] = [
+    { text: `${SHARE_HOOK}\n${url}` },
     { text: SHARE_HOOK, url },
     { url },
-    { text: `${SHARE_HOOK}\n${url}` },
   ];
 
   for (const data of payloads) {
