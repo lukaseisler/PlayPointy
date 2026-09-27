@@ -95,7 +95,7 @@ export function websiteJsonLd() {
         url: SITE_URL,
         logo: {
           "@type": "ImageObject",
-          url: `${SITE_URL}/icon-512x512.png?v=20260927`,
+          url: `${SITE_URL}/icon-512x512.png?v=20260927b`,
           width: 512,
           height: 512,
         },
