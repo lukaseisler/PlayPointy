@@ -30,7 +30,7 @@ const FAQS = [
   {
     question: "How do you play Who is more likely to?",
     answer:
-      "Read the card, point at the person in your group, roast them, then swipe to the next card. No host, no setup, no scoreboard.",
+      "Read the card, everyone points at one person, then swipe. The loser sips, takes a point, or just gets roasted — your table, your rules. No host, no setup.",
   },
   {
     question: "What age is PlayPointy for?",
@@ -103,10 +103,14 @@ export default function AboutPage() {
           <ol className="list-decimal space-y-2 pl-5 text-base leading-relaxed text-neutral-700">
             <li>Open PlayPointy on one phone and sit in a circle.</li>
             <li>
-              Read the card: &ldquo;Who is more likely to…&rdquo; and point at
-              the person.
+              Read the card: &ldquo;Who is more likely to…&rdquo; Everyone
+              points at one person.
             </li>
-            <li>Swipe to the next card. Keep going until someone quits.</li>
+            <li>
+              The loser sips, takes a point, or just gets roasted — your table,
+              your rules.
+            </li>
+            <li>Swipe to the next card. Keep going as long as you like.</li>
           </ol>
         </section>
 
