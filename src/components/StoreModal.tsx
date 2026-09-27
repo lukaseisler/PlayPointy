@@ -167,29 +167,58 @@ export default function StoreModal({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              type="button"
-              onClick={() => {
-                if (user) {
-                  setAccountOpen((v) => !v);
-                } else {
-                  openRestoreLogin();
-                }
-              }}
-              onPointerDown={(e) => e.stopPropagation()}
-              aria-label={user ? "Account" : "Restore purchases"}
-              className="pointer-events-auto absolute top-5 right-5 z-20 flex h-11 w-11 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-neutral-900 transition-opacity hover:opacity-90"
-            >
-              <Image
-                src={user ? "/logged_in_icon.webp" : "/pre_log_in_icon.webp"}
-                alt=""
-                width={256}
-                height={256}
-                sizes="44px"
-                quality={92}
-                className="h-11 w-11 object-cover"
-              />
-            </button>
+            <div className="absolute top-5 right-5 z-20">
+              <button
+                type="button"
+                onClick={() => {
+                  if (user) {
+                    setAccountOpen((v) => !v);
+                  } else {
+                    openRestoreLogin();
+                  }
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
+                aria-label={user ? "Account" : "Restore purchases"}
+                className="pointer-events-auto relative flex h-11 w-11 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-neutral-900 transition-opacity hover:opacity-90"
+              >
+                <Image
+                  src={user ? "/logged_in_icon.webp" : "/pre_log_in_icon.webp"}
+                  alt=""
+                  width={256}
+                  height={256}
+                  sizes="44px"
+                  quality={92}
+                  className="h-11 w-11 object-cover"
+                />
+              </button>
+              {!user ? (
+                <svg
+                  className="pointer-events-none absolute top-1/2 left-1/2 h-[4.75rem] w-[4.75rem] -translate-x-1/2 -translate-y-1/2"
+                  viewBox="0 0 76 76"
+                  aria-hidden
+                >
+                  <path
+                    id="store-restore-arc"
+                    fill="none"
+                    d="M 10 42 A 28 28 0 0 0 66 42"
+                  />
+                  <text
+                    className="fill-neutral-400"
+                    fontSize="8.5"
+                    fontWeight="600"
+                    letterSpacing="0.12em"
+                  >
+                    <textPath
+                      href="#store-restore-arc"
+                      startOffset="50%"
+                      textAnchor="middle"
+                    >
+                      Restore
+                    </textPath>
+                  </text>
+                </svg>
+              ) : null}
+            </div>
 
             <div
               onPointerDown={(e) => dragControls.start(e)}
