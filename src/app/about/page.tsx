@@ -1,5 +1,6 @@
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
+import LegalCloseButton from "@/components/LegalCloseButton";
 import { getStorePacks } from "@/lib/data";
 import { PACK_PRICE_LABEL } from "@/lib/stripe/catalog";
 import { aboutPageJsonLd, faqJsonLd, PACK_BLURBS, pageMetadata } from "@/lib/seo";
@@ -66,14 +67,20 @@ export default function AboutPage() {
   const packs = getStorePacks();
 
   return (
-    <main className="h-full overflow-y-auto bg-white text-neutral-900">
+    <main className="relative h-full bg-white text-neutral-900">
       <JsonLd data={[aboutPageJsonLd(), faqJsonLd(FAQS)]} />
-      <div className="mx-auto max-w-xl space-y-10 px-6 py-12">
-        <p className="text-sm font-medium tracking-wide text-neutral-500 uppercase">
+      <div className="pointer-events-none absolute top-8 right-6 z-10">
+        <div className="pointer-events-auto">
+          <LegalCloseButton />
+        </div>
+      </div>
+      <div className="h-full overflow-y-auto">
+      <div className="mx-auto max-w-xl space-y-10 px-6 pt-8 pb-12">
+        <p className="pr-12 text-sm font-medium tracking-wide text-neutral-500 uppercase">
           Party card game
         </p>
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight">PlayPointy</h1>
+          <h1 className="pr-12 text-4xl font-bold tracking-tight">PlayPointy</h1>
           <p className="text-xl font-medium leading-snug">
             Who is more likely to… the party card game in your browser.
           </p>
@@ -152,6 +159,7 @@ export default function AboutPage() {
             Imprint
           </Link>
         </nav>
+      </div>
       </div>
     </main>
   );

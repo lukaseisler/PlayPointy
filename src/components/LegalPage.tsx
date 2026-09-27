@@ -16,16 +16,17 @@ export default function LegalPage({
 }) {
   return (
     <PhoneFrame>
-      {/* Kein pt am Scroll-Container: ein sticky Kind kann nicht ueber die
-          Content-Box hinaus, sonst scrollt Text sichtbar oberhalb des X. */}
-      <div className="flex h-full flex-col overflow-y-auto bg-white px-6 pb-8">
-        <LegalHashScroll />
-        {/* -mx-6/px-6: volle Breite, damit gescrollter Text unter der Leiste
-            verschwindet statt neben dem X durchzuscheinen. */}
-        <div className="sticky top-0 z-10 -mx-6 flex justify-end bg-white px-6 pt-8 pb-2">
-          <LegalCloseButton />
+      <div className="relative h-full">
+        <div className="pointer-events-none absolute top-8 right-6 z-10">
+          <div className="pointer-events-auto">
+            <LegalCloseButton />
+          </div>
         </div>
-        <h1 className="text-2xl font-semibold text-neutral-900">{title}</h1>
+        <div className="flex h-full flex-col overflow-y-auto bg-white px-6 pb-8 pt-8">
+          <LegalHashScroll />
+          <h1 className="pr-12 text-2xl font-semibold text-neutral-900">
+            {title}
+          </h1>
         <div className="mt-4 flex-1 space-y-3 text-sm leading-relaxed text-neutral-600">
           {children}
         </div>
@@ -41,6 +42,7 @@ export default function LegalPage({
         >
           About PlayPointy
         </Link>
+        </div>
       </div>
     </PhoneFrame>
   );
