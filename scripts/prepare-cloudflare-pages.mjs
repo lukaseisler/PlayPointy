@@ -70,6 +70,7 @@ const routes = {
     "/store/*",
     "/og/*",
     "/favicon.ico",
+    "/favicon-32x32.png",
     "/logo.png",
     "/playpointyapplogo.png",
     "/logged_in_icon.webp",
