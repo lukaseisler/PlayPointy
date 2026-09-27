@@ -1,6 +1,7 @@
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import LegalCloseButton from "@/components/LegalCloseButton";
+import PhoneFrame from "@/components/PhoneFrame";
 import { getStorePacks } from "@/lib/data";
 import { PACK_PRICE_LABEL } from "@/lib/stripe/catalog";
 import { aboutPageJsonLd, faqJsonLd, PACK_BLURBS, pageMetadata } from "@/lib/seo";
@@ -67,6 +68,7 @@ export default function AboutPage() {
   const packs = getStorePacks();
 
   return (
+    <PhoneFrame>
     <main className="relative h-full bg-white text-neutral-900">
       <JsonLd data={[aboutPageJsonLd(), faqJsonLd(FAQS)]} />
       <div className="pointer-events-none absolute top-8 right-6 z-10">
@@ -162,5 +164,6 @@ export default function AboutPage() {
       </div>
       </div>
     </main>
+    </PhoneFrame>
   );
 }
