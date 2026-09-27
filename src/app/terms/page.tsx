@@ -137,7 +137,24 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="8. Usage Rights & &quot;Share&quot; Feature">
+      <Section id="pack-updates" title="8. Emails about New Packs">
+        <p>
+          If you buy a paid pack, we may email the address you used at checkout
+          about new PlayPointy card packs and similar digital content. These
+          emails are optional. You can opt out at any time via the unsubscribe
+          link in the email or by writing to hello@playpointy.com. Opting out
+          does not affect your purchased packs or your account. We do not send
+          these updates only because someone requested a login code or played
+          the free pack.
+        </p>
+        <p>
+          If you already bought a pack before this clause was added, we may
+          still send these updates to that checkout email unless you opt out.
+          How we process that email is set out in the Privacy Policy.
+        </p>
+      </Section>
+
+      <Section title="9. Usage Rights & &quot;Share&quot; Feature">
         <p>
           We grant you a simple, non-exclusive, non-transferable right to use
           the digital content for personal, non-commercial purposes. You may not
@@ -148,7 +165,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="9. Warranty and Liability (AT Law)">
+      <Section title="10. Warranty and Liability (AT Law)">
         <p>
           Statutory warranty rights apply (especially the Austrian Consumer
           Warranty Act, VGG). We are liable without limitation for damages
@@ -159,7 +176,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="10. Service Availability and Termination">
+      <Section title="11. Service Availability and Termination">
         <p>
           We strive to keep &quot;PlayPointy&quot; running smoothly but do not
           guarantee an eternal &quot;lifetime&quot; access, as the game requires
@@ -170,7 +187,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="11. Changes to these Terms">
+      <Section title="12. Changes to these Terms">
         <p>
           We reserve the right to amend these GTC at any time. The version of
           the GTC applicable to your order is the one in effect at the time of
@@ -178,7 +195,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="12. Alternative Dispute Resolution & Applicable Law">
+      <Section title="13. Alternative Dispute Resolution & Applicable Law">
         <p>
           The EU Commission provides an ODR platform:{" "}
           <a
@@ -196,7 +213,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="13. Severability Clause">
+      <Section title="14. Severability Clause">
         <p>
           Should individual provisions of these GTC be invalid, the remainder of
           the contract remains valid. The invalid provision will be replaced by

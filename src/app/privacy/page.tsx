@@ -72,9 +72,10 @@ export default function PrivacyPage() {
             browser type, operating system, and technical request logs.
           </li>
           <li>
-            <strong>Communication &amp; Marketing Data:</strong> Email address,
-            Double Opt-In (DOI) confirmation timestamp, and subscription
-            preferences (for users aged 16+ or with legal guardian consent).
+            <strong>Communication &amp; Marketing Data:</strong> Email address
+            used at checkout, whether you purchased a pack, and your unsubscribe
+            preference for pack-update emails. If you later ask for an extra
+            newsletter, we may also store a confirmation timestamp.
           </li>
           <li>
             <strong>Support Data:</strong> Communication content when contacting
@@ -96,11 +97,15 @@ export default function PrivacyPage() {
           <li>
             <strong>Legitimate Interests (Art. 6(1)(f) GDPR):</strong> Secure
             website delivery, prevention of bot attacks/fraud, privacy-friendly
-            aggregated traffic measurement, and internal business management.
+            aggregated traffic measurement, internal business management, and —
+            if you bought a paid pack — emailing you about new PlayPointy card
+            packs and similar digital content. You can object at any time by
+            unsubscribing.
           </li>
           <li>
-            <strong>Consent (Art. 6(1)(a) GDPR):</strong> Subscription to
-            optional email updates regarding new pack releases.
+            <strong>Consent (Art. 6(1)(a) GDPR):</strong> Any additional email
+            subscription you expressly request (for example a confirmed
+            newsletter sign-up).
           </li>
           <li>
             <strong>Legal Obligation (Art. 6(1)(c) GDPR):</strong> Compliance
@@ -120,8 +125,9 @@ export default function PrivacyPage() {
             authentication (email one-time codes).
           </li>
           <li>
-            <strong>Resend:</strong> Email delivery for one-time sign-in codes
-            (and transactional mail related to authentication).
+            <strong>Resend:</strong> Email delivery for one-time sign-in codes,
+            transactional mail related to authentication, and pack-update emails
+            where those are sent.
           </li>
           <li>
             <strong>Stripe (including Apple Pay / Google Pay):</strong>{" "}
@@ -193,8 +199,9 @@ export default function PrivacyPage() {
             deleted or anonymized within short retention windows.
           </li>
           <li>
-            <strong>Marketing Data:</strong> Retained until you withdraw your
-            consent or unsubscribe.
+            <strong>Marketing Data:</strong> Retained until you unsubscribe or
+            object to pack-update emails, or withdraw consent for any extra
+            newsletter you signed up for.
           </li>
         </ul>
       </Section>
@@ -230,10 +237,12 @@ export default function PrivacyPage() {
             compliance will be retained for the statutory period.
           </li>
           <li>
-            <strong>Withdrawal of Consent:</strong> You may withdraw email
-            subscription consent at any time via the &quot;Unsubscribe&quot;
-            link in any email. Withdrawal does not affect the lawfulness of
-            processing carried out prior to withdrawal.
+            <strong>Unsubscribe / Object to Pack Updates:</strong> You can stop
+            pack-update emails at any time via the &quot;Unsubscribe&quot; link
+            in the email or by writing to hello@playpointy.com. If you also
+            signed up to a separate newsletter, you may withdraw that consent
+            the same way. This does not affect the lawfulness of processing
+            carried out before you opted out.
           </li>
           <li>
             <strong>Right to Object:</strong> You may object to processing based

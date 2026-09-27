@@ -427,6 +427,17 @@ export default function CheckoutConfirmModal({
                   </span>
                 </label>
               </motion.div>
+              <p className="mb-3 text-[11px] leading-snug text-neutral-500 group-data-[short=true]:mb-2">
+                If you buy, we may email that checkout address about new packs.{" "}
+                <Link
+                  href="/terms#pack-updates"
+                  target="_blank"
+                  className="underline underline-offset-2"
+                >
+                  Unsubscribe anytime
+                </Link>
+                .
+              </p>
               <button
                 type="button"
                 disabled={busy}
