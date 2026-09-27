@@ -34,6 +34,41 @@ function splitTitleForTeaser(title: string): { head: string; tail: string } {
   };
 }
 
+function NewCardsLabel({ cardCount }: { cardCount: number }) {
+  return (
+    <motion.span
+      className="inline-block origin-center"
+      initial={{ scale: 0.84 }}
+      animate={{ scale: 1 }}
+      transition={{
+        type: "spring",
+        stiffness: 160,
+        damping: 12,
+        mass: 1.15,
+        delay: 0.5,
+      }}
+    >
+      <motion.span
+        className="bg-[length:220%_100%] bg-clip-text text-transparent"
+        style={{
+          backgroundImage:
+            "linear-gradient(105deg, #171717 0%, #171717 36%, #b0b0b0 50%, #171717 64%, #171717 100%)",
+        }}
+        animate={{ backgroundPosition: ["120% 0%", "-20% 0%"] }}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          repeatDelay: 2.1,
+          ease: [0.4, 0, 0.2, 1],
+          delay: 1.05,
+        }}
+      >
+        {cardCount} new cards
+      </motion.span>
+    </motion.span>
+  );
+}
+
 function TeaserCardTitle({
   text,
   className,
@@ -220,21 +255,7 @@ export default function CheckoutConfirmModal({
                 {packName}
               </h2>
               <p className="mt-1.5 text-center text-[15px] font-bold tracking-[0.14em] text-neutral-900 uppercase group-data-[short=true]:mt-1 group-data-[short=true]:text-[13px]">
-                <motion.span
-                  key={`${packId}-new-cards`}
-                  className="inline-block origin-center will-change-transform"
-                  initial={{ scale: 0.84 }}
-                  animate={{ scale: 1 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 160,
-                    damping: 12,
-                    mass: 1.15,
-                    delay: 0.5,
-                  }}
-                >
-                  {cardCount} new cards
-                </motion.span>
+                <NewCardsLabel key={`${packId}-new-cards`} cardCount={cardCount} />
               </p>
             </div>
 
@@ -428,15 +449,8 @@ export default function CheckoutConfirmModal({
                 </label>
               </motion.div>
               <p className="mb-3 text-[11px] leading-snug text-neutral-500 group-data-[short=true]:mb-2">
-                If you buy, we may email that checkout address about new packs.{" "}
-                <Link
-                  href="/terms#pack-updates"
-                  target="_blank"
-                  className="underline underline-offset-2"
-                >
-                  Unsubscribe anytime
-                </Link>
-                .
+                After unlocking, we may email you about new packs. Unsubscribe
+                anytime.
               </p>
               <button
                 type="button"
@@ -449,11 +463,7 @@ export default function CheckoutConfirmModal({
 
               {error ? (
                 <p className="mt-2 text-center text-xs text-red-600">{error}</p>
-              ) : (
-                <p className="mt-2 text-center text-[11px] text-neutral-400 group-data-[short=true]:hidden">
-                  One-time · stays on this phone · email for receipt &amp; restore
-                </p>
-              )}
+              ) : null}
             </div>
           </motion.div>
         </motion.div>
