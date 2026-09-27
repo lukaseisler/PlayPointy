@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { ShineSweep } from "@/components/ShineSweep";
 import type { PackSummary } from "@/lib/types";
 import { FREE_PACK_ID } from "@/lib/data";
 import { isOwnedPack } from "@/lib/ownedPacks";
@@ -356,9 +357,10 @@ export default function StoreModal({
                               e.stopPropagation();
                               beginPurchase(pack.id, pack.name, reason);
                             }}
-                            className="pointer-events-auto flex-none rounded-full bg-emerald-600 px-3.5 py-2 text-sm font-bold text-white shadow-[0_2px_8px_rgba(5,150,105,0.35)] transition-colors hover:bg-emerald-700"
+                            className="pointer-events-auto relative flex-none overflow-hidden rounded-full bg-emerald-600 px-3.5 py-2 text-sm font-bold text-white shadow-[0_2px_8px_rgba(5,150,105,0.35)] transition-colors hover:bg-emerald-700"
                           >
-                            {PACK_PRICE_LABEL}
+                            <span className="relative z-10">{PACK_PRICE_LABEL}</span>
+                            <ShineSweep delay={1.05 + idx * 0.12} />
                           </button>
                         )}
                       </div>

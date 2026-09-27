@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { displayTitle, getPackById } from "@/lib/data";
 import { PACK_PRICE_LABEL } from "@/lib/stripe/catalog";
 import { createClient } from "@/lib/supabase/client";
+import { ShineSweep } from "@/components/ShineSweep";
 import { usePackTeaserCards } from "@/lib/usePackTeaserCards";
 
 interface CheckoutConfirmModalProps {
@@ -456,9 +457,12 @@ export default function CheckoutConfirmModal({
                 type="button"
                 disabled={busy}
                 onClick={() => void startCheckout()}
-                className="w-full rounded-full bg-emerald-600 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60 group-data-[short=true]:py-3"
+                className="relative w-full overflow-hidden rounded-full bg-emerald-600 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60 group-data-[short=true]:py-3"
               >
-                {busy ? "Redirecting…" : `Unlock now · ${PACK_PRICE_LABEL}`}
+                <span className="relative z-10">
+                  {busy ? "Redirecting…" : `Unlock now · ${PACK_PRICE_LABEL}`}
+                </span>
+                {busy ? null : <ShineSweep />}
               </button>
 
               {error ? (
