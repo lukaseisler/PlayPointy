@@ -59,12 +59,12 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico?v=20260927", sizes: "any" },
+      { url: "/favicon-32x32.png?v=20260927", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192x192.png?v=20260927", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png?v=20260927", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png?v=20260927", sizes: "180x180", type: "image/png" }],
   },
   appleWebApp: {
     capable: true,
@@ -96,7 +96,7 @@ export default function RootLayout({
             Icons/Manifest kommen primaer aus `metadata` oben; Link bleibt
             als Fallback fuer aeltere Clients. */}
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260927" />
         {/* Sofort, vor React: iPhone (nicht PWA) markieren, damit CSS greift
             auch wenn Hydration/HMR auf dem Gerät hakt. */}
         <script

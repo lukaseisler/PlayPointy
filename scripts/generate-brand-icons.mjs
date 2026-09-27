@@ -1,7 +1,7 @@
 import { writeFileSync } from "node:fs";
 import sharp from "sharp";
 
-const SRC = "public/logo saturated.png";
+const SRC = "public/logo-saturated.png";
 
 function pngToIco(images) {
   const count = images.length;
